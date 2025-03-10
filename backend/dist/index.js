@@ -28768,8 +28768,8 @@ app.post("/AddMatrix", async (req, res) => {
       return;
     }
   } catch (error) {
-    res.status(500).json({ message: error });
     console.log(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 app.listen(PORT, () => console.log(`server running on ${PORT}`));

@@ -38,6 +38,7 @@ app.get("/CheckMatrix", async (req, res) => {
 });
 
 app.post("/AddMatrix", async (req, res) => {
+
   const data = req.body;
 
   // if currentTime is equal to time when user id creating matxic 👍 but if user's time is a ahead to before the current time 👎
@@ -55,7 +56,7 @@ app.post("/AddMatrix", async (req, res) => {
     .split("T")[0];
   console.log(currentDate);
 
-  const userDate = data.Dates.split("T")[0]; // Extract YYYY-MM-DD from user input
+  const userDate = data.Dates.split("T")[0]; 
   console.log(userDate);
 
   try {
