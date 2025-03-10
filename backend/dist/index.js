@@ -28619,14 +28619,14 @@ var require_cookie_parser = __commonJS({
     "use strict";
     var cookie = require_cookie2();
     var signature = require_cookie_signature();
-    module2.exports = cookieParser;
+    module2.exports = cookieParser2;
     module2.exports.JSONCookie = JSONCookie;
     module2.exports.JSONCookies = JSONCookies;
     module2.exports.signedCookie = signedCookie;
     module2.exports.signedCookies = signedCookies;
-    function cookieParser(secret, options) {
+    function cookieParser2(secret, options) {
       var secrets = !secret || Array.isArray(secret) ? secret || [] : [secret];
-      return function cookieParser2(req, res, next) {
+      return function cookieParser3(req, res, next) {
         if (req.cookies) {
           return next();
         }
@@ -28717,23 +28717,29 @@ var client = new import_client.PrismaClient();
 var import_cookie_parser = __toESM(require_cookie_parser());
 var app = (0, import_express.default)();
 var PORT = 3e3;
-app.use((0, import_cors.default)());
+app.use((0, import_cors.default)({
+  origin: "http://localhost:3002",
+  credentials: true
+}));
 app.use(import_express.default.json());
 app.use((0, import_cookie_parser.default)());
-app.get("/CheckMatrix", async (req, res) => {
+app.get("/getMatrix", async (req, res) => {
   const id2 = req.cookies.id;
-  console.log(id2);
+  console.log("Matrix ID:", id2);
+  if (!id2) {
+    res.status(400).json({ message: "Missing user ID in cookies." });
+  }
   try {
     const CheckMatrix = await client.user.findUnique({
       where: { id: id2 }
     });
     if (CheckMatrix) {
-      res.status(302).json({ message: `${CheckMatrix.todo}.` });
+      res.status(200).json({ message: `Matrix found: ${CheckMatrix.todo}` });
     } else {
-      res.status(404).json({ message: "There's something wrong in finding your matrix." });
+      res.status(404).json({ message: "Matrix not found for this ID." });
     }
   } catch (error) {
-    res.status(400).json({ error });
+    res.status(500).json({ error: "Internal Server Error", details: error });
   }
 });
 app.post("/AddMatrix", async (req, res) => {
@@ -28747,9 +28753,7 @@ app.post("/AddMatrix", async (req, res) => {
     today.getMonth(),
     today.getDate() + 1
   ).toISOString().split("T")[0];
-  console.log(currentDate);
   const userDate = data.Dates.split("T")[0];
-  console.log(userDate);
   try {
     if (currentDate == userDate) {
       const CreatedMatrix = await client.user.create({
@@ -28758,7 +28762,7 @@ app.post("/AddMatrix", async (req, res) => {
           todo: data.todo
         }
       });
-      res.cookie("id", CreatedMatrix.id, { maxAge: 9e7, httpOnly: true });
+      res.cookie("id", CreatedMatrix.id, { maxAge: 9e7, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" });
       res.status(201).json({
         message: `Your matrix for today has been updated with id ${CreatedMatrix.id} on date ${userDate}`
       });

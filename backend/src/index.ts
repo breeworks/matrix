@@ -2,23 +2,31 @@ import express from "express";
 import cors from "cors";
 import { client } from "./prisma";
 import zod, { number, string, z } from "zod";
-import cookieparser from "cookie-parser";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3002",
+  credentials: true
+}));
 app.use(express.json());
-app.use(cookieparser());
+app.use(cookieParser());
 
 // const matrixSchema = zod.object({
 //     // date : zod.string().date(),
 //     todo : zod.string()
 // })
 
-app.get("/CheckMatrix", async (req, res) => {
-  const id = req.cookies.id;
-  console.log(id);
+app.get("/getMatrix", async (req, res) => {
+  const id = req.cookies.id; 
+   
+  console.log("Matrix ID:", id);
+
+  if (!id) {
+    res.status(400).json({ message: "Missing user ID in cookies." });
+  }
 
   try {
     const CheckMatrix = await client.user.findUnique({
@@ -26,16 +34,15 @@ app.get("/CheckMatrix", async (req, res) => {
     });
 
     if (CheckMatrix) {
-      res.status(302).json({ message: `${CheckMatrix.todo}.` });
+      res.status(200).json({ message: `Matrix found: ${CheckMatrix.todo}` });
     } else {
-      res
-        .status(404)
-        .json({ message: "There's something wrong in finding your matrix." });
+      res.status(404).json({ message: "Matrix not found for this ID." });
     }
   } catch (error) {
-    res.status(400).json({ error });
+    res.status(500).json({ error: "Internal Server Error", details: error });
   }
 });
+
 
 app.post("/AddMatrix", async (req, res) => {
 
@@ -54,10 +61,10 @@ app.post("/AddMatrix", async (req, res) => {
   )
     .toISOString()
     .split("T")[0];
-  console.log(currentDate);
 
   const userDate = data.Dates.split("T")[0]; 
-  console.log(userDate);
+
+// "Your matrix for today has been updated with id 0a2ae97a-9314-44c0-8b34-fd3170a16b51 on date 2025-03-10"
 
   try {
     if (currentDate == userDate) {
@@ -67,9 +74,9 @@ app.post("/AddMatrix", async (req, res) => {
           todo: data.todo,
         },
       });
-      res.cookie("id", CreatedMatrix.id, { maxAge: 90000000, httpOnly: true });
+      res.cookie("id", CreatedMatrix.id, { maxAge: 90000000, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"   });
 
-      res.status(201).json({
+      res.status(201).json({  
         message: `Your matrix for today has been updated with id ${CreatedMatrix.id} on date ${userDate}`,
       });
       return;
