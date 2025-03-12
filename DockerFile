@@ -1,0 +1,15 @@
+FROM node:18
+
+WORKDIR /app
+
+COPY backend backend/
+COPY daily-check daily-check/
+
+WORKDIR /app/backend
+RUN npm install
+RUN npx prisma generate
+
+WORKDIR /app/daily-check
+RUN npm install
+
+CMD ["npm", "run", "start"]
