@@ -28336,8 +28336,13 @@ var require_client = __commonJS({
     });
     exports2.Prisma.UserScalarFieldEnum = {
       id: "id",
+      username: "username"
+    };
+    exports2.Prisma.TodosScalarFieldEnum = {
+      id: "id",
       Dates: "Dates",
-      todo: "todo"
+      todo: "todo",
+      userId: "userId"
     };
     exports2.Prisma.SortOrder = {
       asc: "asc",
@@ -28348,7 +28353,8 @@ var require_client = __commonJS({
       insensitive: "insensitive"
     };
     exports2.Prisma.ModelName = {
-      user: "user"
+      user: "user",
+      todos: "todos"
     };
     var config2 = {
       "generator": {
@@ -28393,8 +28399,8 @@ var require_client = __commonJS({
           }
         }
       },
-      "inlineSchema": '// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel user {\n  id    String   @id @default(uuid())\n  Dates DateTime\n  todo  String\n}\n',
-      "inlineSchemaHash": "24d8ecaedcc2b139cdcecedcd820a4c9d8fbd6a2ab54be0c7400cb34c8b561c6",
+      "inlineSchema": '// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel user {\n  id       String  @id @default(uuid())\n  username String  @unique\n  todos    todos[]\n}\n\nmodel todos {\n  id     String   @id @default(uuid())\n  Dates  DateTime\n  todo   String\n  userId String\n  todos  user     @relation(fields: [userId], references: [id])\n}\n',
+      "inlineSchemaHash": "55e169fbfb7bb2b0f7b8ae12b85e39ed14215c1df36a80d5af146f2778c25b41",
       "copyEngine": true
     };
     var fs2 = require("fs");
@@ -28410,7 +28416,7 @@ var require_client = __commonJS({
       config2.dirname = path.join(process.cwd(), alternativePath);
       config2.isBundled = true;
     }
-    config2.runtimeDataModel = JSON.parse('{"models":{"user":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"Dates","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"DateTime","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todo","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false}},"enums":{},"types":{}}');
+    config2.runtimeDataModel = JSON.parse('{"models":{"user":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"username","kind":"scalar","isList":false,"isRequired":true,"isUnique":true,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todos","kind":"object","isList":true,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"todos","nativeType":null,"relationName":"todosTouser","relationFromFields":[],"relationToFields":[],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false},"todos":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"Dates","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"DateTime","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todo","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"userId","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":true,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todos","kind":"object","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"user","nativeType":null,"relationName":"todosTouser","relationFromFields":["userId"],"relationToFields":["id"],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false}},"enums":{},"types":{}}');
     defineDmmfProperty2(exports2.Prisma, config2.runtimeDataModel);
     config2.engineWasm = void 0;
     config2.compilerWasm = void 0;
@@ -28717,58 +28723,85 @@ var client = new import_client.PrismaClient();
 var import_cookie_parser = __toESM(require_cookie_parser());
 var app = (0, import_express.default)();
 var PORT = 3e3;
-app.use((0, import_cors.default)({
-  origin: "http://localhost:3002",
-  credentials: true
-}));
+app.use((0, import_cors.default)({ origin: "http://localhost:3002", credentials: true }));
 app.use(import_express.default.json());
 app.use((0, import_cookie_parser.default)());
 app.get("/getMatrix", async (req, res) => {
-  const id2 = req.cookies.id;
+  const id2 = req.cookies.UserId;
   console.log("Matrix ID:", id2);
   if (!id2) {
     res.status(400).json({ message: "Missing user ID in cookies." });
+    return;
   }
   try {
-    const CheckMatrix = await client.user.findUnique({
-      where: { id: id2 }
+    const CheckMatrix = await client.todos.findMany({
+      where: { userId: id2 }
     });
-    if (CheckMatrix) {
-      res.status(200).json({ message: `Matrix found: ${CheckMatrix.todo}` });
-    } else {
-      res.status(404).json({ message: "Matrix not found for this ID." });
+    console.log(CheckMatrix);
+    if (CheckMatrix.length === 0) {
+      res.status(404).json({ message: " Matrix not found for this ID." });
+      return;
     }
+    res.status(200).json({ message: `Matrix found`, data: CheckMatrix });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error", details: error });
   }
 });
-app.post("/AddMatrix", async (req, res) => {
+app.post("/AddUser", async (req, res) => {
   const data = req.body;
-  if (!data.Dates) {
-    res.status(400).json({ message: "Date is required in ISO format!" });
-  }
-  const today = /* @__PURE__ */ new Date();
-  const currentDate = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + 1
-  ).toISOString().split("T")[0];
-  const userDate = data.Dates.split("T")[0];
+  const id2 = req.cookies.UserId;
   try {
-    if (currentDate == userDate) {
+    if (await client.user.findUnique({ where: { id: id2 } }))
+      res.status(201).json({ message: "this user name is already taken, find other." });
+    else {
       const CreatedMatrix = await client.user.create({
         data: {
-          Dates: data.Dates,
-          todo: data.todo
+          username: data.username
         }
       });
-      res.cookie("id", CreatedMatrix.id, { maxAge: 9e7, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" });
+      res.cookie("UserId", CreatedMatrix.id, {
+        maxAge: 9e7,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+      });
+      res.status(201).json({ message: "User created successfully!", UserId: CreatedMatrix.id });
+      return;
+    }
+  } catch (error) {
+    res.status(404).json({ error });
+    return;
+  }
+});
+app.post("/AddMatrix", async (req, res) => {
+  const data = req.body;
+  const id2 = req.cookies.UserId;
+  if (!id2) {
+    res.status(400).json({ message: "User ID is missing. Please log in first." });
+    return;
+  }
+  if (!data.Dates) {
+    res.status(400).json({ message: "Date is required in ISO format!" });
+    return;
+  }
+  const today = /* @__PURE__ */ new Date();
+  const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString().split("T")[0];
+  const userDate = data.Dates.split("T")[0];
+  try {
+    if (currentDate === userDate) {
+      const CreatedEntry = await client.todos.create({
+        data: {
+          Dates: new Date(userDate),
+          todo: data.todo,
+          userId: id2
+        }
+      });
       res.status(201).json({
-        message: `Your matrix for today has been updated with id ${CreatedMatrix.id} on date ${userDate}`
+        message: `matrix for today ${CreatedEntry.todo} has been updated  on ${userDate}`
       });
       return;
     } else {
-      res.status(400).json({ message: `Try to update matrix at present date ${currentDate}.` });
+      res.status(400).json({ message: `Try to update matrix on the present date: ${currentDate}.` });
       return;
     }
   } catch (error) {

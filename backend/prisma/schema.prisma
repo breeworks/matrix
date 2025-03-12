@@ -14,7 +14,15 @@ datasource db {
 }
 
 model user {
-  id       String         @id @default(uuid())
+  id          String         @id @default(uuid())
+  username    String         @unique
+  todos       todos[]         
+}
+
+model todos {
+  id        String         @id @default(uuid())
   Dates     DateTime        
-  todo     String         
+  todo      String
+  userId    String
+  todos     user          @relation(fields: [userId], references: [id])
 }
