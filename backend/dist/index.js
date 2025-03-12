@@ -28728,46 +28728,61 @@ app.use(import_express.default.json());
 app.use((0, import_cookie_parser.default)());
 app.get("/getMatrix", async (req, res) => {
   const id2 = req.cookies.UserId;
-  console.log("Matrix ID:", id2);
   if (!id2) {
     res.status(400).json({ message: "Missing user ID in cookies." });
     return;
   }
+  console.log("Matrix ID:", id2);
   try {
-    const CheckMatrix = await client.todos.findMany({
+    const user = await client.user.findUnique({ where: { id: id2 } });
+    if (!user) {
+      res.status(400).json({ message: "User not found in the database." });
+      return;
+    }
+    const userTodo = await client.todos.findMany({
       where: { userId: id2 }
     });
-    console.log(CheckMatrix);
-    if (CheckMatrix.length === 0) {
+    console.log(userTodo);
+    if (userTodo.length === 0) {
       res.status(404).json({ message: " Matrix not found for this ID." });
       return;
     }
-    res.status(200).json({ message: `Matrix found`, data: CheckMatrix });
+    res.status(200).json({ message: `Matrix found`, data: userTodo });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error", details: error });
   }
 });
 app.post("/AddUser", async (req, res) => {
-  const data = req.body;
+  const { username } = req.body;
   const id2 = req.cookies.UserId;
+  if (!username) {
+    res.status(400).json({ message: "Username is required" });
+    return;
+  }
   try {
-    if (await client.user.findUnique({ where: { id: id2 } }))
-      res.status(201).json({ message: "this user name is already taken, find other." });
-    else {
-      const CreatedMatrix = await client.user.create({
-        data: {
-          username: data.username
-        }
-      });
-      res.cookie("UserId", CreatedMatrix.id, {
-        maxAge: 9e7,
+    let existingUser = await client.user.findFirst({ where: { username } });
+    if (existingUser) {
+      res.cookie("UserId", existingUser.id, {
+        maxAge: 7 * 24 * 60 * 60 * 1e3,
+        // 7 days
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
       });
-      res.status(201).json({ message: "User created successfully!", UserId: CreatedMatrix.id });
+      res.status(200).json({ message: "User found!", UserId: existingUser.id });
       return;
     }
+    const newUser = await client.user.create({
+      data: { username }
+    });
+    res.cookie("UserId", newUser.id, {
+      maxAge: 7 * 24 * 60 * 60 * 1e3,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+    });
+    res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
+    return;
   } catch (error) {
     res.status(404).json({ error });
     return;

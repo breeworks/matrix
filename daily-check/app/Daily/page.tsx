@@ -23,6 +23,7 @@ import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type JournalEntry = {
+  id: string;
   date: string;
   content: string;
 };
@@ -33,20 +34,27 @@ export default function Calendar() {
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [todo, setTodo] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [oldEntry, setOldEntry] = useState<JournalEntry[]>([]);
 
   useEffect(() => {
     async function fetchMatrix() {
       try {
-        const response = await axios.get("http://localhost:3000/getMatrix", {
+        const response = await axios.get(`http://localhost:3000/getMatrix`, {
           withCredentials: true,
         });
         console.log("Raw response:", response.data);
 
         if (response.data && Array.isArray(response.data.data)) {
-          setJournalEntries(response.data.data);
-          setOldEntry(response.data.data);
-          console.log("Loaded journal entries:", response.data.data);
+          const formattedEntries = response.data.data.map((item: { id: string; Dates: string | number | Date; todo: string; }) => ({
+            id: item.id,
+            date: format(new Date(item.Dates), "yyyy-MM-dd"),
+            content: item.todo,
+          }));
+
+          setJournalEntries(formattedEntries);
+          setOldEntry(formattedEntries);
+          console.log("Loaded journal entries:", formattedEntries);
         } else {
           console.error("Unexpected response format:", response.data);
         }
@@ -69,16 +77,17 @@ export default function Calendar() {
     setIsDialogOpen(true);
 
     const dateString = format(day, "yyyy-MM-dd");
-    const existingEntry = journalEntries.find(
+
+    const entriesForDate = journalEntries.filter(
       (entry) => entry.date === dateString
     );
+    if (entriesForDate.length > 0) {
 
-    if (existingEntry) {
-      setTodo(existingEntry.content);
-    } else if (isToday(day)) {
-      setTodo("");
+      const combinedEntry = entriesForDate
+        .map((entry,index) => `${index + 1}.${entry.content}`).join("\n");
+      setTodo(combinedEntry);
     } else {
-      setTodo("No entry");
+      setTodo(isToday(day) ? "" : "No entries for this date");
     }
   };
 
@@ -101,7 +110,7 @@ export default function Calendar() {
     const Dates = new Date(dateString).toISOString();
 
     try {
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:3000/AddMatrix",
         { Dates, todo },
         { withCredentials: true }
@@ -112,12 +121,13 @@ export default function Calendar() {
         transition: Bounce,
       });
 
-      setJournalEntries((prev) => {
-        const updatedOldEntries = prev.filter(
-          (entry) => entry.date != dateString
-        );
-        return [...updatedOldEntries, { date: dateString, content: todo }];
-      });
+      const newEntryId = response.data.id || Date.now().toString();
+
+      setJournalEntries((prev) => [
+        ...prev,
+        { id: newEntryId, date: dateString, content: todo },
+      ]);
+      setIsDialogOpen(false);
     } catch (error) {
       console.log(error);
       toast.error("Failed to save entry!", {
@@ -172,24 +182,44 @@ export default function Calendar() {
               <DialogTitle>
                 {selectedDate
                   ? format(selectedDate, "MMMM d, yyyy")
-                  : "Journal Entry"}
+                  : "Journal Entries"}
               </DialogTitle>
             </DialogHeader>
-            <Textarea
-              className="min-h-[250px] resize-none"
-              value={
-                isToday(selectedDate || new Date())
-                  ? todo
-                  : oldEntry.find(
-                      (entry) =>
-                        entry.date &&
-                        format(new Date(entry.date), "yyyy-MM-dd") ===
+
+            {isToday(selectedDate || new Date()) ? (
+              
+              <Textarea
+                className="min-h-[250px] resize-none"
+                value={todo}
+                onChange={(e) => setTodo(e.target.value)}
+              />
+            ) : (
+
+              <div className="min-h-[250px] overflow-y-auto p-4 bg-gray-50 rounded-md">
+                {journalEntries.filter(
+                  (entry) =>
+                    entry.date ===
+                    format(selectedDate || new Date(), "yyyy-MM-dd")
+                ).length > 0 ? (
+                  <ol className="list-decimal pl-6 space-y-4">
+                    {journalEntries
+                      .filter(
+                        (entry) =>
+                          entry.date ===
                           format(selectedDate || new Date(), "yyyy-MM-dd")
-                    )?.content || "No entry"
-              }
-              onChange={(e) => setTodo(e.target.value)}
-              readOnly={!isToday(selectedDate || new Date())}
-            />
+                      )
+                      .map((entry, index) => (
+                        <li key={entry.id || index} className="text-gray-800">
+                          {entry.content}
+                        </li>
+                      ))}
+                  </ol>
+                ) : (
+                  <p className="text-gray-500">No entries for this date</p>
+                )}
+              </div>
+            )}
+
             {isToday(selectedDate || new Date()) && (
               <div className="flex justify-end">
                 <Button
