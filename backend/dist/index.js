@@ -28381,8 +28381,7 @@ var require_client = __commonJS({
         "sourceFilePath": "/home/disha/daily-check/backend/prisma/schema.prisma"
       },
       "relativeEnvPaths": {
-        "rootEnvPath": null,
-        "schemaEnvPath": "../../../.env"
+        "rootEnvPath": null
       },
       "relativePath": "../../../prisma",
       "clientVersion": "6.4.1",
@@ -28407,8 +28406,8 @@ var require_client = __commonJS({
     config2.dirname = __dirname;
     if (!fs2.existsSync(path.join(__dirname, "schema.prisma"))) {
       const alternativePaths = [
-        "node_modules/.prisma/client",
-        ".prisma/client"
+        "../node_modules/.prisma/client",
+        "node_modules/.prisma/client"
       ];
       const alternativePath = alternativePaths.find((altPath) => {
         return fs2.existsSync(path.join(process.cwd(), altPath, "schema.prisma"));
@@ -28429,9 +28428,9 @@ var require_client = __commonJS({
     exports2.PrismaClient = PrismaClient2;
     Object.assign(exports2, Prisma);
     path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node");
-    path.join(process.cwd(), "node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node");
+    path.join(process.cwd(), "../node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node");
     path.join(__dirname, "schema.prisma");
-    path.join(process.cwd(), "node_modules/.prisma/client/schema.prisma");
+    path.join(process.cwd(), "../node_modules/.prisma/client/schema.prisma");
   }
 });
 
@@ -28722,7 +28721,7 @@ var client = new import_client.PrismaClient();
 // src/index.ts
 var import_cookie_parser = __toESM(require_cookie_parser());
 var app = (0, import_express.default)();
-var PORT = 3e3;
+var PORT = process.env.PORT || 3e3;
 app.use((0, import_cors.default)({ origin: "http://localhost:3002", credentials: true }));
 app.use(import_express.default.json());
 app.use((0, import_cookie_parser.default)());
@@ -28764,7 +28763,6 @@ app.post("/AddUser", async (req, res) => {
     if (existingUser) {
       res.cookie("UserId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1e3,
-        // 7 days
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"

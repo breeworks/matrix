@@ -37,12 +37,12 @@ export default function Calendar() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [oldEntry, setOldEntry] = useState<JournalEntry[]>([]);
 
-  const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+  // const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
 
   useEffect(() => {
     async function fetchMatrix() {
       try {
-        const response = await axios.get(`http://${NEXT_PUBLIC_API_URL}/getMatrix`, {
+        const response = await axios.get(`https:/dazzling-nourishment-production.up.railway.app/getMatrix`, {
           withCredentials: true,
         });
         console.log("Raw response:", response.data);
@@ -65,7 +65,7 @@ export default function Calendar() {
       }
     }
     fetchMatrix();
-  }, []);
+  },[]);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 // NEXT_PUBLIC_API_URL="https://dazzling-nourishment"
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+// const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function FrontPage() {
   const [username, setUsername] = useState<string>("");
@@ -16,7 +16,7 @@ export default function FrontPage() {
   async function handleName(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
     try {
-      const response = await axios.post(`http://${NEXT_PUBLIC_API_URL}/AddUser`, {username} , {withCredentials: true});
+      const response = await axios.post(`https://dazzling-nourishment-production.up.railway.app/AddUser`, {username} , {withCredentials: true});
       toast.success(`${username} welcome to matrix`, { position: "top-center", autoClose: 3000, transition: Bounce });
       const data = response.data;
       console.log(data);
