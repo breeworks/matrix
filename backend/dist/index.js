@@ -28721,7 +28721,7 @@ var client = new import_client.PrismaClient();
 // src/index.ts
 var import_cookie_parser = __toESM(require_cookie_parser());
 var app = (0, import_express.default)();
-var PORT = process.env.PORT || 3e3;
+var PORT = 3e3;
 app.use((0, import_cors.default)({ origin: "http://localhost:3002", credentials: true }));
 app.use(import_express.default.json());
 app.use((0, import_cookie_parser.default)());
@@ -28753,7 +28753,6 @@ app.get("/getMatrix", async (req, res) => {
 });
 app.post("/AddUser", async (req, res) => {
   const { username } = req.body;
-  const id2 = req.cookies.UserId;
   if (!username) {
     res.status(400).json({ message: "Username is required" });
     return;
@@ -28761,28 +28760,29 @@ app.post("/AddUser", async (req, res) => {
   try {
     let existingUser = await client.user.findFirst({ where: { username } });
     if (existingUser) {
+      console.log("Existing User Found:", existingUser.id);
       res.cookie("UserId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1e3,
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+        sameSite: "none"
       });
       res.status(200).json({ message: "User found!", UserId: existingUser.id });
       return;
     }
-    const newUser = await client.user.create({
-      data: { username }
-    });
+    const newUser = await client.user.create({ data: { username } });
+    console.log("New User Created:", newUser.id);
     res.cookie("UserId", newUser.id, {
       maxAge: 7 * 24 * 60 * 60 * 1e3,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+      sameSite: "none"
     });
     res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
     return;
   } catch (error) {
-    res.status(404).json({ error });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
     return;
   }
 });
@@ -28798,8 +28798,12 @@ app.post("/AddMatrix", async (req, res) => {
     return;
   }
   const today = /* @__PURE__ */ new Date();
-  const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString().split("T")[0];
-  const userDate = data.Dates.split("T")[0];
+  const currentDate = new Date(
+    today.getUTCFullYear(),
+    today.getUTCMonth(),
+    today.getUTCDate() - 1
+  ).toISOString().split("T")[0];
+  const userDate = new Date(data.Dates).toISOString().split("T")[0];
   try {
     if (currentDate === userDate) {
       const CreatedEntry = await client.todos.create({
@@ -28809,6 +28813,7 @@ app.post("/AddMatrix", async (req, res) => {
           userId: id2
         }
       });
+      console.log(`Current Date (UTC): ${currentDate}, User Date (UTC): ${userDate}`);
       res.status(201).json({
         message: `matrix for today ${CreatedEntry.todo} has been updated  on ${userDate}`
       });

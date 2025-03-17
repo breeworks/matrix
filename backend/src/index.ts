@@ -6,7 +6,8 @@ import cookieParser from "cookie-parser";
 import e from "express";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// const backend = "https://dazzling-nourishment-production.up.railway.app"
+const PORT = 3000;
 
 app.use(cors({ origin: "http://localhost:3002", credentials: true }));
 app.use(express.json());
@@ -49,10 +50,8 @@ app.get("/getMatrix", async (req, res) => {
   }
 });
 
-app.post("/AddUser", async(req,res)=>{
-
-  const {username} = req.body
-  const id = req.cookies.UserId
+app.post("/AddUser", async (req, res) => {
+  const { username } = req.body;
 
   if (!username) {
     res.status(400).json({ message: "Username is required" });
@@ -60,35 +59,35 @@ app.post("/AddUser", async(req,res)=>{
   }
 
   try {
+    let existingUser = await client.user.findFirst({ where: { username } });
 
-    let existingUser = await client.user.findFirst({where: {username}});
-
-    if(existingUser){
-      res.cookie("UserId",existingUser.id,{
-        maxAge: 7 * 24 * 60 * 60 * 1000, 
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === "production", 
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" 
+    if (existingUser) {
+      console.log("Existing User Found:", existingUser.id);
+      res.cookie("UserId", existingUser.id, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
       });
       res.status(200).json({ message: "User found!", UserId: existingUser.id });
       return;
     }
-    const newUser = await client.user.create({
-      data: { username }
-    });
 
-    res.cookie("UserId", newUser.id, { 
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === "production", 
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" 
+    const newUser = await client.user.create({ data: { username } });
+
+    console.log("New User Created:", newUser.id);
+    res.cookie("UserId", newUser.id, {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
     });
 
     res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
     return;
-  }
-     catch (error) {
-    res.status(404).json({error});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
     return;
   }
 });
@@ -108,13 +107,17 @@ app.post("/AddMatrix", async (req, res) => {
   }
 
   const today = new Date();
-  const currentDate = new Date( today.getFullYear(),today.getMonth(), today.getDate() + 1).toISOString().split("T")[0];
-
-  const userDate = data.Dates.split("T")[0]; 
-
+  const currentDate = new Date(
+    today.getUTCFullYear(),
+    today.getUTCMonth(),
+    today.getUTCDate()
+  ).toISOString().split("T")[0];
+  
+  const userDate = new Date(data.Dates).toISOString().split("T")[0];  
+  
   try {
     if (currentDate === userDate) {
-
+      
       const CreatedEntry = await client.todos.create({
         data:{
           Dates: new Date(userDate),
@@ -123,6 +126,8 @@ app.post("/AddMatrix", async (req, res) => {
         }
       })
 
+      console.log(`Current Date (UTC): ${currentDate}, User Date (UTC): ${userDate}`);
+      
       res.status(201).json({  
         message: `matrix for today ${CreatedEntry.todo} has been updated  on ${userDate}`,
       });

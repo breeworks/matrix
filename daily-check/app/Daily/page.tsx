@@ -37,12 +37,12 @@ export default function Calendar() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [oldEntry, setOldEntry] = useState<JournalEntry[]>([]);
 
-  // const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+  const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL  
 
   useEffect(() => {
     async function fetchMatrix() {
       try {
-        const response = await axios.get(`https:/dazzling-nourishment-production.up.railway.app/getMatrix`, {
+        const response = await axios.get(`${NEXT_PUBLIC_API_URL}/getMatrix`, {
           withCredentials: true,
         });
         console.log("Raw response:", response.data);
@@ -108,20 +108,23 @@ export default function Calendar() {
   async function handleSubmit() {
     if (!selectedDate || !todo.trim()) return;
 
-    const dateString = format(selectedDate, "yyyy-MM-dd");
-    const Dates = new Date(dateString).toISOString();
-
+    const dateString = format(selectedDate, "yyyy-MM-dd"); 
+    const utcDate = new Date(dateString + "T00:00:00.000Z").toISOString();
+    console.log(utcDate);
+    
     try {
       const response = await axios.post(
-        "http://localhost:3000/AddMatrix",
-        { Dates, todo },
+        `${NEXT_PUBLIC_API_URL}/AddMatrix`,
+        { Dates: utcDate, todo },
         { withCredentials: true }
       );
-      toast.success("Keep your matrix updated!", {
-        position: "top-center",
-        autoClose: 3000,
-        transition: Bounce,
-      });
+
+        toast.success("Keep your matrix updated!", {
+          position: "top-center",
+          autoClose: 3000,
+          transition: Bounce,
+        });  
+
 
       const newEntryId = response.data.id || Date.now().toString();
 
