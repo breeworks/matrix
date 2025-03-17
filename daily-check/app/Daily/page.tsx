@@ -37,10 +37,12 @@ export default function Calendar() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [oldEntry, setOldEntry] = useState<JournalEntry[]>([]);
 
+  const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+
   useEffect(() => {
     async function fetchMatrix() {
       try {
-        const response = await axios.get(`http://localhost:3000/getMatrix`, {
+        const response = await axios.get(`http://${NEXT_PUBLIC_API_URL}/getMatrix`, {
           withCredentials: true,
         });
         console.log("Raw response:", response.data);

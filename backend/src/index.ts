@@ -8,7 +8,7 @@ import e from "express";
 const app = express();
 const PORT = 3000;
 
-app.use(cors({ origin: "http://localhost:3002", credentials: true }));
+app.use(cors({ origin: "https://https://dazzling-nourishment", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
