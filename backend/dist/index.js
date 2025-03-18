@@ -28381,7 +28381,8 @@ var require_client = __commonJS({
         "sourceFilePath": "/home/disha/daily-check/backend/prisma/schema.prisma"
       },
       "relativeEnvPaths": {
-        "rootEnvPath": null
+        "rootEnvPath": null,
+        "schemaEnvPath": "../../../.env"
       },
       "relativePath": "../../../prisma",
       "clientVersion": "6.4.1",
@@ -28406,8 +28407,8 @@ var require_client = __commonJS({
     config2.dirname = __dirname;
     if (!fs2.existsSync(path.join(__dirname, "schema.prisma"))) {
       const alternativePaths = [
-        "../node_modules/.prisma/client",
-        "node_modules/.prisma/client"
+        "node_modules/.prisma/client",
+        ".prisma/client"
       ];
       const alternativePath = alternativePaths.find((altPath) => {
         return fs2.existsSync(path.join(process.cwd(), altPath, "schema.prisma"));
@@ -28428,9 +28429,9 @@ var require_client = __commonJS({
     exports2.PrismaClient = PrismaClient2;
     Object.assign(exports2, Prisma);
     path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node");
-    path.join(process.cwd(), "../node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node");
+    path.join(process.cwd(), "node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node");
     path.join(__dirname, "schema.prisma");
-    path.join(process.cwd(), "../node_modules/.prisma/client/schema.prisma");
+    path.join(process.cwd(), "node_modules/.prisma/client/schema.prisma");
   }
 });
 
@@ -28799,7 +28800,7 @@ app.post("/AddMatrix", async (req, res) => {
   }
   const todayUTC = /* @__PURE__ */ new Date();
   const currentDate = new Date(
-    Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate())
+    Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate()) - 1
   ).toISOString().split("T")[0];
   const userDate = new Date(Date.parse(data.Dates)).toISOString().split("T")[0];
   console.log(`Backend - currentDate: ${currentDate}, userDate: ${userDate}`);
