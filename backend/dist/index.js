@@ -28814,8 +28814,10 @@ app.post("/AddMatrix", async (req, res) => {
         }
       });
       console.log(`Current Date (UTC): ${currentDate}, User Date (UTC): ${userDate}`);
+      const SaveTodoId = localStorage.setItem("TodoId", CreatedEntry.id);
+      console.log(SaveTodoId);
       res.status(201).json({
-        message: `matrix for today ${CreatedEntry.todo} has been updated  on ${userDate}`
+        message: `matrix for today ${CreatedEntry.todo} has been updated  on ${userDate}.`
       });
       return;
     } else {
@@ -28826,6 +28828,31 @@ app.post("/AddMatrix", async (req, res) => {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
+});
+app.delete("/DeleteMatrix", async (req, res) => {
+  const id2 = req.params;
+  if (!id2) {
+    res.status(400).json({ message: "User || Todo ID is missing." });
+    return;
+  }
+  try {
+    if (typeof id2 !== "string") {
+      throw new Error("Invalid ID: ID must be a string");
+    }
+    const DeleteMatrix = await client.todos.delete({
+      where: {
+        id: id2
+      }
+    });
+    console.log(DeleteMatrix);
+    res.status(201).json({ message: `Todo deleted successfully.` });
+    return;
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+app.post("/UpdateMatrix", async (req, res) => {
 });
 app.listen(PORT, () => console.log(`server running on ${PORT}`));
 /*! Bundled license information:
