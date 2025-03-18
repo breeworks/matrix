@@ -106,15 +106,15 @@ app.post("/AddMatrix", async (req, res) => {
     return;
   }
 
-  const today = new Date();
+  const todayUTC = new Date();
   const currentDate = new Date(
-    today.getUTCFullYear(),
-    today.getUTCMonth(),
-    today.getUTCDate() - 1
+    Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate())
   ).toISOString().split("T")[0];
   
-  const userDate = new Date(data.Dates).toISOString().split("T")[0];  
+  const userDate = new Date(Date.parse(data.Dates)).toISOString().split("T")[0];
   
+  console.log(`Backend - currentDate: ${currentDate}, userDate: ${userDate}`);
+    
   try {
     if (currentDate === userDate) {
       

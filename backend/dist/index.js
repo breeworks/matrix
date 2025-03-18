@@ -28797,13 +28797,12 @@ app.post("/AddMatrix", async (req, res) => {
     res.status(400).json({ message: "Date is required in ISO format!" });
     return;
   }
-  const today = /* @__PURE__ */ new Date();
+  const todayUTC = /* @__PURE__ */ new Date();
   const currentDate = new Date(
-    today.getUTCFullYear(),
-    today.getUTCMonth(),
-    today.getUTCDate() - 1
+    Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate())
   ).toISOString().split("T")[0];
-  const userDate = new Date(data.Dates).toISOString().split("T")[0];
+  const userDate = new Date(Date.parse(data.Dates)).toISOString().split("T")[0];
+  console.log(`Backend - currentDate: ${currentDate}, userDate: ${userDate}`);
   try {
     if (currentDate === userDate) {
       const CreatedEntry = await client.todos.create({
@@ -28830,22 +28829,22 @@ app.post("/AddMatrix", async (req, res) => {
   }
 });
 app.delete("/DeleteMatrix", async (req, res) => {
-  const id2 = req.params;
-  if (!id2) {
+  const TodoId = req.params;
+  if (!TodoId) {
     res.status(400).json({ message: "User || Todo ID is missing." });
     return;
   }
   try {
-    if (typeof id2 !== "string") {
+    if (typeof TodoId !== "string") {
       throw new Error("Invalid ID: ID must be a string");
     }
     const DeleteMatrix = await client.todos.delete({
       where: {
-        id: id2
+        id: TodoId
       }
     });
     console.log(DeleteMatrix);
-    res.status(201).json({ message: `Todo deleted successfully.` });
+    res.status(201).json({ message: `Todo deleted successfully ${TodoId}.` });
     return;
   } catch (error) {
     console.log(error);
