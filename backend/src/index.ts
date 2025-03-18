@@ -108,7 +108,7 @@ app.post("/AddMatrix", async (req, res) => {
 
   const todayUTC = new Date();
   const currentDate = new Date(
-    Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate())
+    Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate() - 1)
   ).toISOString().split("T")[0];
   
   const userDate = new Date(Date.parse(data.Dates)).toISOString().split("T")[0];
