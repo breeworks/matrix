@@ -22,7 +22,7 @@ model user {
 model todos {
   id        String         @id @default(uuid())
   Dates     DateTime        
-  todo      String
+  todo      String          
   userId    String
-  todos     user          @relation(fields: [userId], references: [id])
+  user     user          @relation(fields: [userId], references: [id])
 }

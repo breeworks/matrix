@@ -28364,7 +28364,7 @@ var require_client = __commonJS({
           "value": "prisma-client-js"
         },
         "output": {
-          "value": "/home/disha/daily-check/backend/node_modules/@prisma/client",
+          "value": "/home/disha/matrix/backend/node_modules/@prisma/client",
           "fromEnvVar": null
         },
         "config": {
@@ -28378,7 +28378,7 @@ var require_client = __commonJS({
           }
         ],
         "previewFeatures": [],
-        "sourceFilePath": "/home/disha/daily-check/backend/prisma/schema.prisma"
+        "sourceFilePath": "/home/disha/matrix/backend/prisma/schema.prisma"
       },
       "relativeEnvPaths": {
         "rootEnvPath": null,
@@ -28391,6 +28391,7 @@ var require_client = __commonJS({
         "db"
       ],
       "activeProvider": "postgresql",
+      "postinstall": false,
       "inlineDatasources": {
         "db": {
           "url": {
@@ -28399,8 +28400,8 @@ var require_client = __commonJS({
           }
         }
       },
-      "inlineSchema": '// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel user {\n  id       String  @id @default(uuid())\n  username String  @unique\n  todos    todos[]\n}\n\nmodel todos {\n  id     String   @id @default(uuid())\n  Dates  DateTime\n  todo   String\n  userId String\n  todos  user     @relation(fields: [userId], references: [id])\n}\n',
-      "inlineSchemaHash": "55e169fbfb7bb2b0f7b8ae12b85e39ed14215c1df36a80d5af146f2778c25b41",
+      "inlineSchema": '// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel user {\n  id       String  @id @default(uuid())\n  username String  @unique\n  todos    todos[]\n}\n\nmodel todos {\n  id     String   @id @default(uuid())\n  Dates  DateTime\n  todo   String\n  userId String\n  user   user     @relation(fields: [userId], references: [id])\n}\n',
+      "inlineSchemaHash": "3278223ce8b6603f292efe25bc8123d81e6db9b456a560eab0cfc73910d38b78",
       "copyEngine": true
     };
     var fs2 = require("fs");
@@ -28416,7 +28417,7 @@ var require_client = __commonJS({
       config2.dirname = path.join(process.cwd(), alternativePath);
       config2.isBundled = true;
     }
-    config2.runtimeDataModel = JSON.parse('{"models":{"user":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"username","kind":"scalar","isList":false,"isRequired":true,"isUnique":true,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todos","kind":"object","isList":true,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"todos","nativeType":null,"relationName":"todosTouser","relationFromFields":[],"relationToFields":[],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false},"todos":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"Dates","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"DateTime","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todo","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"userId","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":true,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todos","kind":"object","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"user","nativeType":null,"relationName":"todosTouser","relationFromFields":["userId"],"relationToFields":["id"],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false}},"enums":{},"types":{}}');
+    config2.runtimeDataModel = JSON.parse('{"models":{"user":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"username","kind":"scalar","isList":false,"isRequired":true,"isUnique":true,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todos","kind":"object","isList":true,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"todos","nativeType":null,"relationName":"todosTouser","relationFromFields":[],"relationToFields":[],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false},"todos":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"Dates","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"DateTime","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todo","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"userId","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":true,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"user","kind":"object","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"user","nativeType":null,"relationName":"todosTouser","relationFromFields":["userId"],"relationToFields":["id"],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false}},"enums":{},"types":{}}');
     defineDmmfProperty2(exports2.Prisma, config2.runtimeDataModel);
     config2.engineWasm = void 0;
     config2.compilerWasm = void 0;
@@ -28765,8 +28766,8 @@ app.post("/AddUser", async (req, res) => {
       res.cookie("UserId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1e3,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none"
+        secure: false,
+        sameSite: "lax"
       });
       res.status(200).json({ message: "User found!", UserId: existingUser.id });
       return;
@@ -28776,8 +28777,8 @@ app.post("/AddUser", async (req, res) => {
     res.cookie("UserId", newUser.id, {
       maxAge: 7 * 24 * 60 * 60 * 1e3,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none"
+      secure: false,
+      sameSite: "lax"
     });
     res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
     return;
@@ -28788,74 +28789,61 @@ app.post("/AddUser", async (req, res) => {
   }
 });
 app.post("/AddMatrix", async (req, res) => {
-  const data = req.body;
-  const id2 = req.cookies.UserId;
-  if (!id2) {
+  const { Dates, todo } = req.body;
+  const userId = req.cookies.UserId;
+  if (!userId) {
     res.status(400).json({ message: "User ID is missing. Please log in first." });
     return;
   }
-  if (!data.Dates) {
+  if (!Dates) {
     res.status(400).json({ message: "Date is required in ISO format!" });
     return;
   }
-  const userDate = new Date(data.Dates);
-  const now = /* @__PURE__ */ new Date();
-  const isToday = userDate.getUTCFullYear() === now.getUTCFullYear() && userDate.getUTCMonth() === now.getUTCMonth() && userDate.getUTCDate() === now.getUTCDate();
-  console.log(`Is user date today? ${isToday}`);
-  console.log(`User date: ${userDate.toISOString()}, Now: ${now.toISOString()}`);
   try {
-    if (isToday) {
-      const CreatedEntry = await client.todos.create({
-        data: {
-          Dates: new Date(data.Dates),
-          todo: data.todo,
-          userId: id2
-        }
-      });
-      res.status(201).json({
-        message: `Matrix has been updated successfully.`,
-        id: CreatedEntry.id
-      });
-    } else {
-      const formattedNow = now.toISOString().split("T")[0];
-      res.status(400).json({
-        message: `Try to update matrix on the present date: ${formattedNow}.`,
-        userDate: userDate.toISOString().split("T")[0]
-      });
+    const newTodos = todo.split("\n").map((items) => items.trim()).filter(Boolean);
+    if (newTodos.length === 0) {
+      res.status(400).json({ message: "No valid todos found." });
+      return;
     }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-  console.log("Request body:", req.body);
-  console.log("User provided date (raw):", data.Dates);
-  console.log("Parsed user date:", new Date(data.Dates).toISOString());
-  console.log("Current server date:", (/* @__PURE__ */ new Date()).toISOString());
-});
-app.delete("/DeleteMatrix", async (req, res) => {
-  const TodoId = req.params;
-  if (!TodoId) {
-    res.status(400).json({ message: "User || Todo ID is missing." });
-    return;
-  }
-  try {
-    if (typeof TodoId !== "string") {
-      throw new Error("Invalid ID: ID must be a string");
-    }
-    const DeleteMatrix = await client.todos.delete({
-      where: {
-        id: TodoId
-      }
+    console.log(newTodos);
+    const existingTodos = await client.todos.findMany({
+      where: { Dates: new Date(Dates), userId },
+      orderBy: { id: "asc" }
     });
-    console.log(DeleteMatrix);
-    res.status(201).json({ message: `Todo deleted successfully ${TodoId}.` });
-    return;
+    const existingTodoList = existingTodos.map((entry) => entry.todo);
+    console.log(existingTodoList);
+    if (JSON.stringify(existingTodoList) === JSON.stringify(newTodos)) {
+      res.status(200).json({ message: "No changes detected. Matrix not updated." });
+      return;
+    }
+    let createdEntries = [];
+    for (let i = 0; i < newTodos.length; i++) {
+      if (existingTodos[i]) {
+        const updatedTodo = await client.todos.update({
+          where: { id: existingTodos[i].id },
+          data: { todo: newTodos[i] }
+        });
+        createdEntries.push({ id: updatedTodo.id, todo: updatedTodo.todo });
+      } else {
+        const createdTodo = await client.todos.create({ data: { Dates: new Date(Dates), todo: newTodos[i], userId } });
+        createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
+      }
+      if (existingTodos.length > newTodos.length) {
+        const extraTodos = existingTodos.splice(newTodos.length);
+        for (const extra of extraTodos) {
+          await client.todos.delete({ where: { id: extra.id } });
+        }
+        res.status(201).json({
+          message: "Todos updated successfully.",
+          todos: createdEntries
+        });
+      }
+    }
   } catch (error) {
-    console.log(error);
+    console.error("Error creating todos:", error);
     res.status(500).json({ message: "Internal server error" });
+    return;
   }
-});
-app.post("/UpdateMatrix", async (req, res) => {
 });
 app.listen(PORT, () => console.log(`server running on ${PORT}`));
 /*! Bundled license information:

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, KeyboardEvent } from "react";
-import { Trash, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../component/ui/button";
 import {
   Dialog,
@@ -52,8 +52,8 @@ export default function Calendar() {
               content: item.todo,
             })
           );
-
           setJournalEntries(formattedEntries);
+          console.log(formattedEntries); 
         }
       } catch (error) {
         console.error("Error fetching matrix:", error);
@@ -78,7 +78,8 @@ export default function Calendar() {
 
     if (entriesForDate.length > 0) {
       // Use proper numbered list format with each item on a new line
-      setTodo(entriesForDate[0].content || "");
+      // setTodo(entriesForDate[0].content || "");
+      setTodo(entriesForDate.map(entry => entry.content).join("\n"));
     } else {
       setTodo(isToday(day) ? "1. " : "No entries for this date");
     }
@@ -122,10 +123,10 @@ export default function Calendar() {
     const count = entry?.content.length || 0;
 
     if (count === 0) return "";
-    if (count < 9) return "bg-gradient-to-r from-blue-500 via-teal-400 to-green-400";
-    if (count < 12) return "bg-gradient-to-r from-green-400 via-yellow-300 to-yellow-500";
-    if (count < 15) return "bg-gradient-to-r from-yellow-500 via-orange-400 to-orange-500";
-    return "bg-gradient-to-r from-orange-500 via-red-500 to-rose-500";
+    if (count < 9) return "bg-gradient-to-r from-blue-200 via-blue-200 to-blue-300";
+    if (count < 12) return "bg-gradient-to-r from-blue-300 via-blue-400 to-blue-600";
+    if (count < 15) return "bg-gradient-to-r from-blue-400 via-blue-600 to-blue-800";
+    return "bg-gradient-to-r from-blue-200 via-blue-300 to-blue-400";
   }
 
   async function handleSubmit() {
@@ -134,6 +135,8 @@ export default function Calendar() {
     const dateString = format(selectedDate, "yyyy-MM-dd");
     const utcDate = new Date(dateString + "T00:00:00.000Z").toISOString();
     
+    // const todoList = todo.split("\n").map((item) => item.trim()).filter(Boolean);
+
     try {
       const response = await axios.post(
         `${NEXT_PUBLIC_API_URL}/AddMatrix`,
@@ -167,28 +170,6 @@ export default function Calendar() {
     }
   }
 
-  async function handleDelete(id: string) {
-    try {
-      await axios.delete(`${NEXT_PUBLIC_API_URL}/DeleteMatrix`, {
-        withCredentials: true,
-      });
-
-      setJournalEntries((prev) => prev.filter((entry) => entry.id !== id));
-
-      toast.info("Entry deleted!", {
-        position: "top-center",
-        autoClose: 3000,
-        transition: Bounce,
-      });
-    } catch (error) {
-      toast.error("Failed to delete entry!", {
-        position: "top-center",
-        autoClose: 3000,
-        transition: Bounce,
-      });
-      console.log(error);
-    }
-  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">

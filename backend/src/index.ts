@@ -81,7 +81,7 @@ app.post("/AddUser", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
-    });
+  });
 
     res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
     return;
@@ -93,94 +93,70 @@ app.post("/AddUser", async (req, res) => {
 });
 
 app.post("/AddMatrix", async (req, res) => {
-  const data = req.body;
-  const id = req.cookies.UserId;
-  
-  if (!id) {
+  const { Dates, todo } = req.body;
+  const userId = req.cookies.UserId;
+
+  if (!userId) {
     res.status(400).json({ message: "User ID is missing. Please log in first." });
-    return;
+    return 
   }
-  
-  if (!data.Dates) {
+
+  if (!Dates) {
     res.status(400).json({ message: "Date is required in ISO format!" });
-    return;
+    return 
   }
-  
-  try {
-    // First check if an entry already exists for this date and user
-    const existingEntry = await client.todos.findFirst({
-      where: {
-        userId: id,
-        Dates: {
-          // Compare just the date part
-          gte: new Date(new Date(data.Dates).setHours(0, 0, 0, 0)),
-          lt: new Date(new Date(data.Dates).setHours(23, 59, 59, 999))
-        }
-      }
-    });
-    
-    let CreatedEntry;
-    
-    if (existingEntry) {
-      // Update the existing entry
-      CreatedEntry = await client.todos.update({
-        where: {
-          id: existingEntry.id
-        },
-        data: {
-          todo: data.todo
-        }
-      });
-    } else {
-      // Create a new entry
-      CreatedEntry = await client.todos.create({
-        data: {
-          Dates: new Date(data.Dates),
-          todo: data.todo,
-          userId: id
-        }
-      });
+
+  try{
+    const newTodos = todo.split("\n").map((items : string)=>items.trim()).filter(Boolean);
+    if (newTodos.length === 0) {
+      res.status(400).json({ message: "No valid todos found." });
+      return;
     }
-    
+    console.log(newTodos);
+
+    const existingTodos = await client.todos.findMany({
+        where: { Dates: new Date(Dates), userId: userId },
+        orderBy: { id: "asc" },  
+    });
+
+    const existingTodoList = existingTodos.map((entry) => entry.todo);
+    console.log(existingTodoList);
+   
+    if(JSON.stringify(existingTodoList) === JSON.stringify(newTodos)){
+      res.status(200).json({ message: "No changes detected. Matrix not updated." });
+      return;
+    }
+
+    let createdEntries = [];
+
+    for(let i = 0; i< newTodos.length;i++){
+      if(existingTodos[i]){
+        const updatedTodo = await client.todos.update({
+          where: { id: existingTodos[i].id },
+          data: { todo: newTodos[i] },
+        });
+        createdEntries.push({ id: updatedTodo.id, todo: updatedTodo.todo });
+    }else{
+      const createdTodo = await client.todos.create({data:{Dates: new Date(Dates), todo: newTodos[i], userId: userId}});
+      createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
+    }
+
+    if(existingTodos.length > newTodos.length){
+      const extraTodos =   existingTodos.splice(newTodos.length);
+      for (const extra of extraTodos) {
+        await client.todos.delete({ where: { id: extra.id } });
+    }
     res.status(201).json({
-      message: "Entry saved successfully",
-      id: CreatedEntry.id
+      message: "Todos updated successfully.",
+      todos: createdEntries,
     });
-  } catch (error) {
-    console.log(error);
+  } 
+}
+  }catch (error) {
+    console.error("Error creating todos:", error);
     res.status(500).json({ message: "Internal server error" });
+    return;
   }
 });
-
-
-app.delete("/DeleteMatrix", async (req, res) => {
-
-  const TodoId = req.params; 
-
-  if (!TodoId) {
-    res.status(400).json({ message: "User || Todo ID is missing." });
-    return;
-  }  
-
-  try {
-    if (typeof TodoId !== "string") {
-      throw new Error("Invalid ID: ID must be a string");
-    }
-
-    const DeleteMatrix = await client.todos.delete({
-      where:{
-        id: TodoId
-      }
-    })
-    console.log(DeleteMatrix);
-    res.status(201).json({message : `Todo deleted successfully ${TodoId}.`});
-    return;
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-app.post("/UpdateMatrix", async (req,res) => {})
 
 app.listen(PORT, () => console.log(`server running on ${PORT}`));
