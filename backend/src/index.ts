@@ -94,53 +94,37 @@ app.post("/AddUser", async (req, res) => {
 
 app.post("/AddMatrix", async (req, res) => {
   const data = req.body;
-  const id = req.cookies.UserId; 
-
+  const id = req.cookies.UserId;
+  
   if (!id) {
     res.status(400).json({ message: "User ID is missing. Please log in first." });
     return;
   }
-
+  
   if (!data.Dates) {
     res.status(400).json({ message: "Date is required in ISO format!" });
     return;
   }
-
-  const todayUTC = new Date();
-  const currentDate = new Date(
-    Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate()) - 1
-  ).toISOString().split("T")[0];
   
-  const userDate = new Date(Date.parse(data.Dates)).toISOString().split("T")[0];
+  // Simply use the date provided by the frontend
+  const userDate = new Date(data.Dates).toISOString().split("T")[0];
   
-  console.log(`Backend - currentDate: ${currentDate}, userDate: ${userDate}`);
-    
+  console.log(`Backend - userDate: ${userDate}`);
+  
   try {
-    if (currentDate === userDate) {
-      
-      const CreatedEntry = await client.todos.create({
-        data:{
-          Dates: new Date(userDate),
-          todo: data.todo,
-          userId: id
-        }
-      })
-
-      console.log(`Current Date (UTC): ${currentDate}, User Date (UTC): ${userDate}`);
-
-      const SaveTodoId = localStorage.setItem("TodoId",CreatedEntry.id);
-      console.log(SaveTodoId);
-      
-      
-      res.status(201).json({  
-        message: `matrix for today ${CreatedEntry.todo} has been updated  on ${userDate}.`,
-      });
-      return;
-      
-    } else {
-      res.status(400).json({message: `Try to update matrix on the present date: ${currentDate}.`});
-      return;
-    }
+    const CreatedEntry = await client.todos.create({
+      data: {
+        Dates: new Date(userDate),
+        todo: data.todo,
+        userId: id
+      }
+    });
+    
+    res.status(201).json({
+      message: `Matrix has been updated for ${userDate}.`,
+      id: CreatedEntry.id
+    });
+    return;
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
