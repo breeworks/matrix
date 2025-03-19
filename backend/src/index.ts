@@ -106,31 +106,48 @@ app.post("/AddMatrix", async (req, res) => {
     return;
   }
   
-  // Simply use the date provided by the frontend
-  const userDate = new Date(data.Dates).toISOString().split("T")[0];
+  const userDate = new Date(data.Dates);
   
-  console.log(`Backend - userDate: ${userDate}`);
+  const now = new Date();
+  
+  const isToday = 
+    userDate.getUTCFullYear() === now.getUTCFullYear() &&
+    userDate.getUTCMonth() === now.getUTCMonth() &&
+    userDate.getUTCDate() === now.getUTCDate();
+  
+  console.log(`Is user date today? ${isToday}`);
+  console.log(`User date: ${userDate.toISOString()}, Now: ${now.toISOString()}`);
   
   try {
-    const CreatedEntry = await client.todos.create({
-      data: {
-        Dates: new Date(userDate),
-        todo: data.todo,
-        userId: id
-      }
-    });
-    
-    res.status(201).json({
-      message: `Matrix has been updated for ${userDate}.`,
-      id: CreatedEntry.id
-    });
-    return;
+    if (isToday) {
+      const CreatedEntry = await client.todos.create({
+        data: {
+          Dates: new Date(data.Dates),
+          todo: data.todo,
+          userId: id
+        }
+      });
+      
+      res.status(201).json({
+        message: `Matrix has been updated successfully.`,
+        id: CreatedEntry.id
+      });
+    } else {
+      const formattedNow = now.toISOString().split('T')[0];
+      res.status(400).json({
+        message: `Try to update matrix on the present date: ${formattedNow}.`,
+        userDate: userDate.toISOString().split('T')[0]
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
+  console.log('Request body:', req.body);
+  console.log('User provided date (raw):', data.Dates);
+  console.log('Parsed user date:', new Date(data.Dates).toISOString());
+  console.log('Current server date:', new Date().toISOString());
 });
-
 app.delete("/DeleteMatrix", async (req, res) => {
 
   const TodoId = req.params; 

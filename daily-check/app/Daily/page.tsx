@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, KeyboardEvent } from "react";
+import { Trash, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../component/ui/button";
 import {
   Dialog,
@@ -34,10 +34,8 @@ export default function Calendar() {
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [todo, setTodo] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [oldEntry, setOldEntry] = useState<JournalEntry[]>([]);
 
-  const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL  
+  const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     async function fetchMatrix() {
@@ -45,27 +43,24 @@ export default function Calendar() {
         const response = await axios.get(`${NEXT_PUBLIC_API_URL}/getMatrix`, {
           withCredentials: true,
         });
-        console.log("Raw response:", response.data);
 
         if (response.data && Array.isArray(response.data.data)) {
-          const formattedEntries = response.data.data.map((item: { id: string; Dates: string | number | Date; todo: string; }) => ({
-            id: item.id,
-            date: format(new Date(item.Dates), "yyyy-MM-dd"),
-            content: item.todo,
-          }));
+          const formattedEntries = response.data.data.map(
+            (item: { id: string; Dates: string | number | Date; todo: string }) => ({
+              id: item.id,
+              date: format(new Date(item.Dates), "yyyy-MM-dd"),
+              content: item.todo,
+            })
+          );
 
           setJournalEntries(formattedEntries);
-          setOldEntry(formattedEntries);
-          console.log("Loaded journal entries:", formattedEntries);
-        } else {
-          console.error("Unexpected response format:", response.data);
         }
       } catch (error) {
         console.error("Error fetching matrix:", error);
       }
     }
     fetchMatrix();
-  },[]);
+  }, []);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -79,17 +74,45 @@ export default function Calendar() {
     setIsDialogOpen(true);
 
     const dateString = format(day, "yyyy-MM-dd");
+    const entriesForDate = journalEntries.filter((entry) => entry.date === dateString);
 
-    const entriesForDate = journalEntries.filter(
-      (entry) => entry.date === dateString
-    );
     if (entriesForDate.length > 0) {
-
-      const combinedEntry = entriesForDate
-        .map((entry,index) => `${index + 1}.${entry.content}`).join("\n");
-      setTodo(combinedEntry);
+      // Use proper numbered list format with each item on a new line
+      setTodo(entriesForDate[0].content || "");
     } else {
-      setTodo(isToday(day) ? "" : "No entries for this date");
+      setTodo(isToday(day) ? "1. " : "No entries for this date");
+    }
+  };
+
+  // Handle keydown event for the textarea to add automatic numbering
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      
+      const currentText = todo;
+      const lines = currentText.split('\n');
+      const lastLine = lines[lines.length - 1];
+      
+      // Check if the last line starts with a number followed by a period
+      const match = lastLine.match(/^(\d+)\.\s/);
+      
+      if (match) {
+        const currentNumber = parseInt(match[1], 10);
+        const nextNumber = currentNumber + 1;
+        
+        // If the last line is empty except for the number, replace it
+        if (lastLine.trim() === `${currentNumber}. `) {
+          lines[lines.length - 1] = `${nextNumber}. `;
+        } else {
+          // Otherwise add a new line with the next number
+          lines.push(`${nextNumber}. `);
+        }
+        
+        setTodo(lines.join('\n'));
+      } else {
+        // If there's no numbered list, start one
+        setTodo(currentText + '\n1. ');
+      }
     }
   };
 
@@ -99,18 +122,17 @@ export default function Calendar() {
     const count = entry?.content.length || 0;
 
     if (count === 0) return "";
-    if (count < 9) return "bg-gradient-to-r from-blue-400 to-green-400";
-    if (count < 12) return "bg-gradient-to-r from-green-400 to-yellow-400";
-    if (count < 15) return "bg-gradient-to-r from-yellow-400 to-orange-400";
-    return "bg-gradient-to-r from-orange-400 to-red-500";
+    if (count < 9) return "bg-gradient-to-r from-blue-500 via-teal-400 to-green-400";
+    if (count < 12) return "bg-gradient-to-r from-green-400 via-yellow-300 to-yellow-500";
+    if (count < 15) return "bg-gradient-to-r from-yellow-500 via-orange-400 to-orange-500";
+    return "bg-gradient-to-r from-orange-500 via-red-500 to-rose-500";
   }
 
   async function handleSubmit() {
     if (!selectedDate || !todo.trim()) return;
 
-    const dateString = format(selectedDate, "yyyy-MM-dd"); 
+    const dateString = format(selectedDate, "yyyy-MM-dd");
     const utcDate = new Date(dateString + "T00:00:00.000Z").toISOString();
-    console.log(utcDate);
     
     try {
       const response = await axios.post(
@@ -119,34 +141,58 @@ export default function Calendar() {
         { withCredentials: true }
       );
 
-        toast.success("Keep your matrix updated!", {
-          position: "top-center",
-          autoClose: 3000,
-          transition: Bounce,
-        });  
-
+      toast.success("Keep your matrix updated!", {
+        position: "top-center",
+        autoClose: 3000,
+        transition: Bounce,
+      });
 
       const newEntryId = response.data.id || Date.now().toString();
 
-      setJournalEntries((prev) => [
-        ...prev,
-        { id: newEntryId, date: dateString, content: todo },
-      ]);
+      setJournalEntries((prev) => {
+        // Remove any existing entries for this date
+        const filteredEntries = prev.filter(entry => entry.date !== dateString);
+        // Add the new entry
+        return [...filteredEntries, { id: newEntryId, date: dateString, content: todo }];
+      });
+      
       setIsDialogOpen(false);
     } catch (error) {
-      console.log(error);
       toast.error("Failed to save entry!", {
         position: "top-center",
         autoClose: 3000,
         transition: Bounce,
       });
+      console.log(error);
     }
-    setIsDialogOpen(false);
+  }
+
+  async function handleDelete(id: string) {
+    try {
+      await axios.delete(`${NEXT_PUBLIC_API_URL}/DeleteMatrix`, {
+        withCredentials: true,
+      });
+
+      setJournalEntries((prev) => prev.filter((entry) => entry.id !== id));
+
+      toast.info("Entry deleted!", {
+        position: "top-center",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+    } catch (error) {
+      toast.error("Failed to delete entry!", {
+        position: "top-center",
+        autoClose: 3000,
+        transition: Bounce,
+      });
+      console.log(error);
+    }
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 m-10 bg-white">
-      <div className="min-h-screen w-full max-w-lg p-10 text-2xl">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+      <div className="min-h-screen w-full max-w-lg p-10 m-28 text-2xl">
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={prevMonth}>
             <ChevronLeft className="h-5 w-5" />
@@ -159,22 +205,12 @@ export default function Calendar() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-7 gap-1 text-center mb-2">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-            <div key={day} className="text-sm font-medium">
-              {day}
-            </div>
-          ))}
-        </div>
-
         <div className="grid grid-cols-7 gap-2">
           {daysInMonth.map((day) => (
             <button
               key={day.toString()}
               onClick={() => handleDateClick(day)}
-              className={`h-12 w-full rounded-md flex items-center justify-center ${gradient(
-                day
-              )}`}
+              className={`h-12 w-full rounded-md flex items-center justify-center ${gradient(day)}`}
             >
               {format(day, "d")}
             </button>
@@ -185,47 +221,35 @@ export default function Calendar() {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>
-                {selectedDate
-                  ? format(selectedDate, "MMMM d, yyyy")
-                  : "Journal Entries"}
+                {selectedDate ? format(selectedDate, "MMMM d, yyyy") : "Journal Entries"}
               </DialogTitle>
             </DialogHeader>
 
             {isToday(selectedDate || new Date()) ? (
-              
               <Textarea
-                className="min-h-[250px] resize-none"
+                className="resize-y min-h-[200px] max-h-[500px] whitespace-pre-wrap font-mono"
                 value={todo}
                 onChange={(e) => setTodo(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="1. "
               />
             ) : (
-
               <div className="min-h-[250px] overflow-y-auto p-4 bg-gray-50 rounded-md">
                 {journalEntries.filter(
-                  (entry) =>
-                    entry.date ===
-                    format(selectedDate || new Date(), "yyyy-MM-dd")
+                  (entry) => entry.date === format(selectedDate || new Date(), "yyyy-MM-dd")
                 ).length > 0 ? (
-                  <ol className="list-decimal pl-6 space-y-4">
+                  <div className="whitespace-pre-wrap font-mono text-gray-800">
                     {journalEntries
-                      .filter(
-                        (entry) =>
-                          entry.date ===
-                          format(selectedDate || new Date(), "yyyy-MM-dd")
-                      )
-                      .map((entry, index) => (
-                        <li key={entry.id || index} className="text-gray-800">
-                          {entry.content}
-                        </li>
-                      ))}
-                  </ol>
+                      .filter((entry) => entry.date === format(selectedDate || new Date(), "yyyy-MM-dd"))
+                      .map((entry) => entry.content)
+                      .join('\n')}
+                  </div>
                 ) : (
                   <p className="text-gray-500">No entries for this date</p>
                 )}
-              </div>
-            )}
-
-            {isToday(selectedDate || new Date()) && (
+                </div>
+              )}
+              {isToday(selectedDate || new Date()) && (
               <div className="flex justify-end">
                 <Button
                   onClick={handleSubmit}
@@ -238,11 +262,7 @@ export default function Calendar() {
           </DialogContent>
         </Dialog>
 
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          transition={Bounce}
-        />
+        <ToastContainer position="top-center" autoClose={3000} transition={Bounce} />
       </div>
     </main>
   );
