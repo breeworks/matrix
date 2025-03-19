@@ -106,48 +106,53 @@ app.post("/AddMatrix", async (req, res) => {
     return;
   }
   
-  const userDate = new Date(data.Dates);
-  
-  const now = new Date();
-  
-  const isToday = 
-    userDate.getUTCFullYear() === now.getUTCFullYear() &&
-    userDate.getUTCMonth() === now.getUTCMonth() &&
-    userDate.getUTCDate() === now.getUTCDate();
-  
-  console.log(`Is user date today? ${isToday}`);
-  console.log(`User date: ${userDate.toISOString()}, Now: ${now.toISOString()}`);
-  
   try {
-    if (isToday) {
-      const CreatedEntry = await client.todos.create({
+    // First check if an entry already exists for this date and user
+    const existingEntry = await client.todos.findFirst({
+      where: {
+        userId: id,
+        Dates: {
+          // Compare just the date part
+          gte: new Date(new Date(data.Dates).setHours(0, 0, 0, 0)),
+          lt: new Date(new Date(data.Dates).setHours(23, 59, 59, 999))
+        }
+      }
+    });
+    
+    let CreatedEntry;
+    
+    if (existingEntry) {
+      // Update the existing entry
+      CreatedEntry = await client.todos.update({
+        where: {
+          id: existingEntry.id
+        },
+        data: {
+          todo: data.todo
+        }
+      });
+    } else {
+      // Create a new entry
+      CreatedEntry = await client.todos.create({
         data: {
           Dates: new Date(data.Dates),
           todo: data.todo,
           userId: id
         }
       });
-      
-      res.status(201).json({
-        message: `Matrix has been updated successfully.`,
-        id: CreatedEntry.id
-      });
-    } else {
-      const formattedNow = now.toISOString().split('T')[0];
-      res.status(400).json({
-        message: `Try to update matrix on the present date: ${formattedNow}.`,
-        userDate: userDate.toISOString().split('T')[0]
-      });
     }
+    
+    res.status(201).json({
+      message: "Entry saved successfully",
+      id: CreatedEntry.id
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
-  console.log('Request body:', req.body);
-  console.log('User provided date (raw):', data.Dates);
-  console.log('Parsed user date:', new Date(data.Dates).toISOString());
-  console.log('Current server date:', new Date().toISOString());
 });
+
+
 app.delete("/DeleteMatrix", async (req, res) => {
 
   const TodoId = req.params; 
