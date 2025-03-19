@@ -127,22 +127,34 @@ app.post("/AddMatrix", async (req, res) => {
       return;
     }
 
+    const newTodosList = newTodos.map((todo: string) => todo.trim()).filter(Boolean);
+
     let createdEntries = [];
 
-    for(let i = 0; i< newTodos.length;i++){
-      if(existingTodos[i]){
-        const updatedTodo = await client.todos.update({
-          where: { id: existingTodos[i].id },
-          data: { todo: newTodos[i] },
-        });
-        createdEntries.push({ id: updatedTodo.id, todo: updatedTodo.todo });
-    }else{
-      const createdTodo = await client.todos.create({data:{Dates: new Date(Dates), todo: newTodos[i], userId: userId}});
-      createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
-    }
+      for(let i = 0; i< newTodos.length;i++){
+        if(existingTodos[i]){
 
-    if(existingTodos.length > newTodos.length){
-      const extraTodos =   existingTodos.splice(newTodos.length);
+        if(existingTodos[i].todo !== newTodosList[i]){
+          const updatedTodo = await client.todos.update({
+            where: { id: existingTodos[i].id },
+            data: { todo: newTodosList[i] },
+          });
+          createdEntries.push({ id: updatedTodo.id, todo: updatedTodo.todo });
+      }
+      else{
+        createdEntries.push({ id: existingTodos[i].id, todo: existingTodos[i].todo })
+      }
+    }
+      else{
+        console.log("Creating todo with:", { Dates, todo, userId });
+
+        const createdTodo = await client.todos.create({data:{Dates: new Date(Dates), todo: newTodos[i],userId}});
+        createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
+      }
+    
+
+    if(existingTodos.length > newTodosList.length){
+      const extraTodos =   existingTodos.splice(newTodosList.length);
       for (const extra of extraTodos) {
         await client.todos.delete({ where: { id: extra.id } });
     }
