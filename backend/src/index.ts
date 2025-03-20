@@ -6,10 +6,9 @@ import cookieParser from "cookie-parser";
 import e from "express";
 
 const app = express();
-// const backend = "https://dazzling-nourishment-production.up.railway.app"
 const PORT = 3000;
 
-app.use(cors({ origin: "http://localhost:3002", credentials: true }));
+app.use(cors({ origin: "https://daily-matrix.vercel.app/", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
