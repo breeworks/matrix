@@ -77,7 +77,6 @@ export default function Calendar() {
     const entriesForDate = journalEntries.filter((entry) => entry.date === dateString);
 
     if (entriesForDate.length > 0) {
-      // Use proper numbered list format with each item on a new line
       // setTodo(entriesForDate[0].content || "");
       setTodo(entriesForDate.map(entry => entry.content).join("\n"));
     } else {
@@ -85,7 +84,6 @@ export default function Calendar() {
     }
   };
 
-  // Handle keydown event for the textarea to add automatic numbering
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -94,24 +92,20 @@ export default function Calendar() {
       const lines = currentText.split('\n');
       const lastLine = lines[lines.length - 1];
       
-      // Check if the last line starts with a number followed by a period
       const match = lastLine.match(/^(\d+)\.\s/);
       
       if (match) {
         const currentNumber = parseInt(match[1], 10);
         const nextNumber = currentNumber + 1;
-        
-        // If the last line is empty except for the number, replace it
+
         if (lastLine.trim() === `${currentNumber}. `) {
           lines[lines.length - 1] = `${nextNumber}. `;
         } else {
-          // Otherwise add a new line with the next number
           lines.push(`${nextNumber}. `);
         }
         
         setTodo(lines.join('\n'));
       } else {
-        // If there's no numbered list, start one
         setTodo(currentText + '\n1. ');
       }
     }
@@ -135,8 +129,6 @@ export default function Calendar() {
     const dateString = format(selectedDate, "yyyy-MM-dd");
     const utcDate = new Date(dateString + "T00:00:00.000Z").toISOString();
     
-    // const todoList = todo.split("\n").map((item) => item.trim()).filter(Boolean);
-
     try {
       const response = await axios.post(
         `${NEXT_PUBLIC_API_URL}/AddMatrix`,
@@ -153,9 +145,7 @@ export default function Calendar() {
       const newEntryId = response.data.id || Date.now().toString();
 
       setJournalEntries((prev) => {
-        // Remove any existing entries for this date
         const filteredEntries = prev.filter(entry => entry.date !== dateString);
-        // Add the new entry
         return [...filteredEntries, { id: newEntryId, date: dateString, content: todo }];
       });
       
@@ -178,7 +168,7 @@ export default function Calendar() {
           <Button variant="ghost" onClick={prevMonth}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h2 className="text-xl font-medium text-gray-700">
+          <h2 className="text-2xl font-bold  text-gray-700">
             {format(currentMonth, "MMMM yyyy")}
           </h2>
           <Button variant="ghost" onClick={nextMonth}>
@@ -248,109 +238,3 @@ export default function Calendar() {
     </main>
   );
 }
-
-/**
- * New User Created: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
-Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-[ '1. debug.', '2. added update and delete routes.' ]
-[]
-Error creating todos: PrismaClientKnownRequestError: 
-Invalid `prisma.todos.create()` invocation:
-
-
-Foreign key constraint violated: `todos_userId_fkey (index)`
-    at Un.handleRequestError (/app/dist/index.js:27860:17)
-    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
-    at Un.request (/app/dist/index.js:27837:16)
-    at async l (/app/dist/index.js:28231:21)
-    at async /app/dist/index.js:28828:29 {
-  code: 'P2003',
-  clientVersion: '6.4.1',
-  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
-}
-[ '1. debug.', '2. added update and delete routes.' ]
-[]
-Error creating todos: PrismaClientKnownRequestError: 
-Invalid `prisma.todos.create()` invocation:
-
-
-Foreign key constraint violated: `todos_userId_fkey (index)`
-    at Un.handleRequestError (/app/dist/index.js:27860:17)
-    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
-    at Un.request (/app/dist/index.js:27837:16)
-    at async l (/app/dist/index.js:28231:21)
-    at async /app/dist/index.js:28828:29 {
-  code: 'P2003',
-  clientVersion: '6.4.1',
-  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
-}
-[ '1. debug.', '2. added update and delete routes.' ]
-[]
-Error creating todos: PrismaClientKnownRequestError: 
-Invalid `prisma.todos.create()` invocation:
-
-
-Foreign key constraint violated: `todos_userId_fkey (index)`
-    at Un.handleRequestError (/app/dist/index.js:27860:17)
-    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
-    at Un.request (/app/dist/index.js:27837:16)
-    at async l (/app/dist/index.js:28231:21)
-    at async /app/dist/index.js:28828:29 {
-  code: 'P2003',
-  clientVersion: '6.4.1',
-  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
-}
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-New User Created: 1315f514-9aaf-4080-9de7-0c545bbb53ce
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-[ '1. played cricket', '2. completed html tutorial' ]
-[]
-Error creating todos: PrismaClientKnownRequestError: 
-Invalid `prisma.todos.create()` invocation:
-
-
-Foreign key constraint violated: `todos_userId_fkey (index)`
-    at Un.handleRequestError (/app/dist/index.js:27860:17)
-    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
-    at Un.request (/app/dist/index.js:27837:16)
-    at async l (/app/dist/index.js:28231:21)
-    at async /app/dist/index.js:28828:29 {
-  code: 'P2003',
-  clientVersion: '6.4.1',
-  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
-}
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
-[ '1. debug' ]
-[]
-Error creating todos: PrismaClientKnownRequestError: 
-Invalid `prisma.todos.create()` invocation:
-
-
-Foreign key constraint violated: `todos_userId_fkey (index)`
-    at Un.handleRequestError (/app/dist/index.js:27860:17)
-    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
-    at Un.request (/app/dist/index.js:27837:16)
-    at async l (/app/dist/index.js:28231:21)
-    at async /app/dist/index.js:28828:29 {
-  code: 'P2003',
-  clientVersion: '6.4.1',
-  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
-}
-Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
-Existing User Found: 1315f514-9aaf-4080-9de7-0c545bbb53ce
-Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
-Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
-Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
-
- */
