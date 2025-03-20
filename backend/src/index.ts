@@ -1,14 +1,25 @@
 import express from "express";
 import cors from "cors";
 import { client } from "./prisma";
-import zod, { number, string, z } from "zod";
 import cookieParser from "cookie-parser";
-import e from "express";
 
 const app = express();
 const PORT = 3000;
 
-app.use(cors({ origin: "https://daily-matrix.vercel.app/", credentials: true }));
+const allowedOrigins = ["https://daily-matrix.vercel.app"];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
