@@ -28724,7 +28724,19 @@ var client = new import_client.PrismaClient();
 var import_cookie_parser = __toESM(require_cookie_parser());
 var app = (0, import_express.default)();
 var PORT = 3e3;
-app.use((0, import_cors.default)({ origin: "http://localhost:3002", credentials: true }));
+var allowedOrigins = ["https://daily-matrix.vercel.app"];
+app.use(
+  (0, import_cors.default)({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true
+  })
+);
 app.use(import_express.default.json());
 app.use((0, import_cookie_parser.default)());
 app.get("/getMatrix", async (req, res) => {
@@ -28800,6 +28812,11 @@ app.post("/AddMatrix", async (req, res) => {
     res.status(400).json({ message: "Date is required in ISO format!" });
     return;
   }
+  console.log("cookie content", req.cookies);
+  const userExists = await client.user.findUnique({
+    where: { id: userId }
+  });
+  console.log("User found:", !!userExists);
   try {
     const newTodos = todo.split("\n").map((items) => items.trim()).filter(Boolean);
     if (newTodos.length === 0) {
@@ -28831,20 +28848,20 @@ app.post("/AddMatrix", async (req, res) => {
           createdEntries.push({ id: existingTodos[i].id, todo: existingTodos[i].todo });
         }
       } else {
-        console.log("Creating todo with:", { Dates, todo, userId });
+        console.log("Creating todo with:", { Dates, newTodos, userId });
         const createdTodo = await client.todos.create({ data: { Dates: new Date(Dates), todo: newTodos[i], userId } });
         createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
       }
-      if (existingTodos.length > newTodosList.length) {
-        const extraTodos = existingTodos.splice(newTodosList.length);
-        for (const extra of extraTodos) {
-          await client.todos.delete({ where: { id: extra.id } });
-        }
-        res.status(201).json({
-          message: "Todos updated successfully.",
-          todos: createdEntries
-        });
+    }
+    if (existingTodos.length > newTodosList.length) {
+      const extraTodos = existingTodos.splice(newTodosList.length);
+      for (const extra of extraTodos) {
+        await client.todos.delete({ where: { id: extra.id } });
       }
+      res.status(201).json({
+        message: "Todos updated successfully.",
+        todos: createdEntries
+      });
     }
   } catch (error) {
     console.error("Error creating todos:", error);
