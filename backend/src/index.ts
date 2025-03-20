@@ -93,82 +93,91 @@ app.post("/AddUser", async (req, res) => {
 });
 
 app.post("/AddMatrix", async (req, res) => {
-  const { Dates, todo } = req.body;
-  const userId = req.cookies.UserId;
+    const { Dates, todo } = req.body;
+    const userId = req.cookies.UserId;
 
-  if (!userId) {
-    res.status(400).json({ message: "User ID is missing. Please log in first." });
-    return 
-  }
-
-  if (!Dates) {
-    res.status(400).json({ message: "Date is required in ISO format!" });
-    return 
-  }
-
-  try{
-    const newTodos = todo.split("\n").map((items : string)=>items.trim()).filter(Boolean);
-    if (newTodos.length === 0) {
-      res.status(400).json({ message: "No valid todos found." });
-      return;
+    if (!userId) {
+      res.status(400).json({ message: "User ID is missing. Please log in first." });
+      return 
     }
-    console.log(newTodos);
+    console.log("UserId from cookies:", userId);
 
-    const existingTodos = await client.todos.findMany({
-        where: { Dates: new Date(Dates), userId: userId },
-        orderBy: { id: "asc" },  
+    if (!Dates) {
+      res.status(400).json({ message: "Date is required in ISO format!" });
+      return 
+    }
+
+    console.log("cookie content",req.cookies);
+
+    const userExists = await client.user.findUnique({
+      where: { id: userId }
     });
-
-    const existingTodoList = existingTodos.map((entry) => entry.todo);
-    console.log(existingTodoList);
-   
-    if(JSON.stringify(existingTodoList) === JSON.stringify(newTodos)){
-      res.status(200).json({ message: "No changes detected. Matrix not updated." });
-      return;
-    }
-
-    const newTodosList = newTodos.map((todo: string) => todo.trim()).filter(Boolean);
-
-    let createdEntries = [];
-
-      for(let i = 0; i< newTodos.length;i++){
-        if(existingTodos[i]){
-
-        if(existingTodos[i].todo !== newTodosList[i]){
-          const updatedTodo = await client.todos.update({
-            where: { id: existingTodos[i].id },
-            data: { todo: newTodosList[i] },
-          });
-          createdEntries.push({ id: updatedTodo.id, todo: updatedTodo.todo });
-      }
-      else{
-        createdEntries.push({ id: existingTodos[i].id, todo: existingTodos[i].todo })
-      }
-    }
-      else{
-        console.log("Creating todo with:", { Dates, todo, userId });
-
-        const createdTodo = await client.todos.create({data:{Dates: new Date(Dates), todo: newTodos[i],userId}});
-        createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
-      }
+    console.log("User found:", !!userExists);
     
 
-    if(existingTodos.length > newTodosList.length){
-      const extraTodos =   existingTodos.splice(newTodosList.length);
-      for (const extra of extraTodos) {
-        await client.todos.delete({ where: { id: extra.id } });
+    try{
+      const newTodos = todo.split("\n").map((items : string)=>items.trim()).filter(Boolean);
+      if (newTodos.length === 0) {
+        res.status(400).json({ message: "No valid todos found." });
+        return;
+      }
+      console.log(newTodos);
+
+      const existingTodos = await client.todos.findMany({
+          where: { Dates: new Date(Dates), userId: userId },
+          orderBy: { id: "asc" },  
+      });
+
+      const existingTodoList = existingTodos.map((entry) => entry.todo);
+      console.log(existingTodoList);
+    
+      if(JSON.stringify(existingTodoList) === JSON.stringify(newTodos)){
+        res.status(200).json({ message: "No changes detected. Matrix not updated." });
+        return;
+      }
+
+      const newTodosList = newTodos.map((todo: string) => todo.trim()).filter(Boolean);
+
+      let createdEntries = [];
+
+        for(let i = 0; i< newTodos.length;i++){
+          if(existingTodos[i]){
+
+          if(existingTodos[i].todo !== newTodosList[i]){
+            const updatedTodo = await client.todos.update({
+              where: { id: existingTodos[i].id },
+              data: { todo: newTodosList[i] },
+            });
+            createdEntries.push({ id: updatedTodo.id, todo: updatedTodo.todo });
+        }
+        else{
+          createdEntries.push({ id: existingTodos[i].id, todo: existingTodos[i].todo })
+        }
+      }
+        else{
+          console.log("Creating todo with:", { Dates, newTodos, userId });
+
+          const createdTodo = await client.todos.create({data:{Dates: new Date(Dates), todo: newTodos[i],userId}});
+          createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
+        }
+      }
+
+      if(existingTodos.length > newTodosList.length){
+        const extraTodos =   existingTodos.splice(newTodosList.length);
+        for (const extra of extraTodos) {
+          await client.todos.delete({ where: { id: extra.id } });
+      }
+      res.status(201).json({
+        message: "Todos updated successfully.",
+        todos: createdEntries,
+      });
+    } 
+
+    }catch (error) {
+      console.error("Error creating todos:", error);
+      res.status(500).json({ message: "Internal server error" });
+      return;
     }
-    res.status(201).json({
-      message: "Todos updated successfully.",
-      todos: createdEntries,
-    });
-  } 
-}
-  }catch (error) {
-    console.error("Error creating todos:", error);
-    res.status(500).json({ message: "Internal server error" });
-    return;
-  }
 });
 
 app.listen(PORT, () => console.log(`server running on ${PORT}`));

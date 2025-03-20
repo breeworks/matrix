@@ -28340,9 +28340,9 @@ var require_client = __commonJS({
     };
     exports2.Prisma.TodosScalarFieldEnum = {
       id: "id",
-      Dates: "Dates",
       todo: "todo",
-      userId: "userId"
+      userId: "userId",
+      Dates: "Dates"
     };
     exports2.Prisma.SortOrder = {
       asc: "asc",
@@ -28400,8 +28400,8 @@ var require_client = __commonJS({
           }
         }
       },
-      "inlineSchema": '// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel user {\n  id       String  @id @default(uuid())\n  username String  @unique\n  todos    todos[]\n}\n\nmodel todos {\n  id     String   @id @default(uuid())\n  Dates  DateTime\n  todo   String\n  userId String\n  user   user     @relation(fields: [userId], references: [id])\n}\n',
-      "inlineSchemaHash": "3278223ce8b6603f292efe25bc8123d81e6db9b456a560eab0cfc73910d38b78",
+      "inlineSchema": 'generator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel user {\n  id       String  @id @default(uuid())\n  username String  @unique\n  todos    todos[]\n}\n\nmodel todos {\n  id     String   @id @default(uuid())\n  todo   String\n  userId String\n  Dates  DateTime\n  user   user     @relation(fields: [userId], references: [id])\n}\n',
+      "inlineSchemaHash": "ab152b6a0e92643a653a3540062a44c9747bf972dfd3bdc774cfb0b31b62c0e4",
       "copyEngine": true
     };
     var fs2 = require("fs");
@@ -28417,7 +28417,7 @@ var require_client = __commonJS({
       config2.dirname = path.join(process.cwd(), alternativePath);
       config2.isBundled = true;
     }
-    config2.runtimeDataModel = JSON.parse('{"models":{"user":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"username","kind":"scalar","isList":false,"isRequired":true,"isUnique":true,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todos","kind":"object","isList":true,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"todos","nativeType":null,"relationName":"todosTouser","relationFromFields":[],"relationToFields":[],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false},"todos":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"Dates","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"DateTime","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todo","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"userId","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":true,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"user","kind":"object","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"user","nativeType":null,"relationName":"todosTouser","relationFromFields":["userId"],"relationToFields":["id"],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false}},"enums":{},"types":{}}');
+    config2.runtimeDataModel = JSON.parse('{"models":{"user":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"username","kind":"scalar","isList":false,"isRequired":true,"isUnique":true,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"todos","kind":"object","isList":true,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"todos","nativeType":null,"relationName":"todosTouser","relationFromFields":[],"relationToFields":[],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false},"todos":{"dbName":null,"schema":null,"fields":[{"name":"id","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":true,"isReadOnly":false,"hasDefaultValue":true,"type":"String","nativeType":null,"default":{"name":"uuid","args":[4]},"isGenerated":false,"isUpdatedAt":false},{"name":"todo","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"userId","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":true,"hasDefaultValue":false,"type":"String","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"Dates","kind":"scalar","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"DateTime","nativeType":null,"isGenerated":false,"isUpdatedAt":false},{"name":"user","kind":"object","isList":false,"isRequired":true,"isUnique":false,"isId":false,"isReadOnly":false,"hasDefaultValue":false,"type":"user","nativeType":null,"relationName":"todosTouser","relationFromFields":["userId"],"relationToFields":["id"],"isGenerated":false,"isUpdatedAt":false}],"primaryKey":null,"uniqueFields":[],"uniqueIndexes":[],"isGenerated":false}},"enums":{},"types":{}}');
     defineDmmfProperty2(exports2.Prisma, config2.runtimeDataModel);
     config2.engineWasm = void 0;
     config2.compilerWasm = void 0;
@@ -28766,8 +28766,8 @@ app.post("/AddUser", async (req, res) => {
       res.cookie("UserId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1e3,
         httpOnly: true,
-        secure: false,
-        sameSite: "lax"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none"
       });
       res.status(200).json({ message: "User found!", UserId: existingUser.id });
       return;
@@ -28777,8 +28777,8 @@ app.post("/AddUser", async (req, res) => {
     res.cookie("UserId", newUser.id, {
       maxAge: 7 * 24 * 60 * 60 * 1e3,
       httpOnly: true,
-      secure: false,
-      sameSite: "lax"
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none"
     });
     res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
     return;
@@ -28795,6 +28795,7 @@ app.post("/AddMatrix", async (req, res) => {
     res.status(400).json({ message: "User ID is missing. Please log in first." });
     return;
   }
+  console.log("UserId from cookies:", userId);
   if (!Dates) {
     res.status(400).json({ message: "Date is required in ISO format!" });
     return;
@@ -28816,20 +28817,26 @@ app.post("/AddMatrix", async (req, res) => {
       res.status(200).json({ message: "No changes detected. Matrix not updated." });
       return;
     }
+    const newTodosList = newTodos.map((todo2) => todo2.trim()).filter(Boolean);
     let createdEntries = [];
     for (let i = 0; i < newTodos.length; i++) {
       if (existingTodos[i]) {
-        const updatedTodo = await client.todos.update({
-          where: { id: existingTodos[i].id },
-          data: { todo: newTodos[i] }
-        });
-        createdEntries.push({ id: updatedTodo.id, todo: updatedTodo.todo });
+        if (existingTodos[i].todo !== newTodosList[i]) {
+          const updatedTodo = await client.todos.update({
+            where: { id: existingTodos[i].id },
+            data: { todo: newTodosList[i] }
+          });
+          createdEntries.push({ id: updatedTodo.id, todo: updatedTodo.todo });
+        } else {
+          createdEntries.push({ id: existingTodos[i].id, todo: existingTodos[i].todo });
+        }
       } else {
+        console.log("Creating todo with:", { Dates, todo, userId });
         const createdTodo = await client.todos.create({ data: { Dates: new Date(Dates), todo: newTodos[i], userId } });
         createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
       }
-      if (existingTodos.length > newTodos.length) {
-        const extraTodos = existingTodos.splice(newTodos.length);
+      if (existingTodos.length > newTodosList.length) {
+        const extraTodos = existingTodos.splice(newTodosList.length);
         for (const extra of extraTodos) {
           await client.todos.delete({ where: { id: extra.id } });
         }

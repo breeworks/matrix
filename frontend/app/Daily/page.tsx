@@ -248,3 +248,109 @@ export default function Calendar() {
     </main>
   );
 }
+
+/**
+ * New User Created: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
+Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+[ '1. debug.', '2. added update and delete routes.' ]
+[]
+Error creating todos: PrismaClientKnownRequestError: 
+Invalid `prisma.todos.create()` invocation:
+
+
+Foreign key constraint violated: `todos_userId_fkey (index)`
+    at Un.handleRequestError (/app/dist/index.js:27860:17)
+    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
+    at Un.request (/app/dist/index.js:27837:16)
+    at async l (/app/dist/index.js:28231:21)
+    at async /app/dist/index.js:28828:29 {
+  code: 'P2003',
+  clientVersion: '6.4.1',
+  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
+}
+[ '1. debug.', '2. added update and delete routes.' ]
+[]
+Error creating todos: PrismaClientKnownRequestError: 
+Invalid `prisma.todos.create()` invocation:
+
+
+Foreign key constraint violated: `todos_userId_fkey (index)`
+    at Un.handleRequestError (/app/dist/index.js:27860:17)
+    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
+    at Un.request (/app/dist/index.js:27837:16)
+    at async l (/app/dist/index.js:28231:21)
+    at async /app/dist/index.js:28828:29 {
+  code: 'P2003',
+  clientVersion: '6.4.1',
+  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
+}
+[ '1. debug.', '2. added update and delete routes.' ]
+[]
+Error creating todos: PrismaClientKnownRequestError: 
+Invalid `prisma.todos.create()` invocation:
+
+
+Foreign key constraint violated: `todos_userId_fkey (index)`
+    at Un.handleRequestError (/app/dist/index.js:27860:17)
+    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
+    at Un.request (/app/dist/index.js:27837:16)
+    at async l (/app/dist/index.js:28231:21)
+    at async /app/dist/index.js:28828:29 {
+  code: 'P2003',
+  clientVersion: '6.4.1',
+  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
+}
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+New User Created: 1315f514-9aaf-4080-9de7-0c545bbb53ce
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+[ '1. played cricket', '2. completed html tutorial' ]
+[]
+Error creating todos: PrismaClientKnownRequestError: 
+Invalid `prisma.todos.create()` invocation:
+
+
+Foreign key constraint violated: `todos_userId_fkey (index)`
+    at Un.handleRequestError (/app/dist/index.js:27860:17)
+    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
+    at Un.request (/app/dist/index.js:27837:16)
+    at async l (/app/dist/index.js:28231:21)
+    at async /app/dist/index.js:28828:29 {
+  code: 'P2003',
+  clientVersion: '6.4.1',
+  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
+}
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+Matrix ID: 1d58ff53-a075-4e0a-92a5-117a1fc1ae01
+[ '1. debug' ]
+[]
+Error creating todos: PrismaClientKnownRequestError: 
+Invalid `prisma.todos.create()` invocation:
+
+
+Foreign key constraint violated: `todos_userId_fkey (index)`
+    at Un.handleRequestError (/app/dist/index.js:27860:17)
+    at Un.handleAndLogRequestError (/app/dist/index.js:27846:16)
+    at Un.request (/app/dist/index.js:27837:16)
+    at async l (/app/dist/index.js:28231:21)
+    at async /app/dist/index.js:28828:29 {
+  code: 'P2003',
+  clientVersion: '6.4.1',
+  meta: { modelName: 'todos', field_name: 'todos_userId_fkey (index)' }
+}
+Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
+Existing User Found: 1315f514-9aaf-4080-9de7-0c545bbb53ce
+Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
+Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
+Existing User Found: 59095a7c-5d3a-4942-9136-406e7f2aa5cf
+
+ */
