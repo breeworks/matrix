@@ -28391,7 +28391,6 @@ var require_client = __commonJS({
         "db"
       ],
       "activeProvider": "postgresql",
-      "postinstall": false,
       "inlineDatasources": {
         "db": {
           "url": {
@@ -28400,8 +28399,32 @@ var require_client = __commonJS({
           }
         }
       },
-      "inlineSchema": 'generator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel user {\n  id       String  @id @default(uuid())\n  username String  @unique\n  todos    todos[]\n}\n\nmodel todos {\n  id     String   @id @default(uuid())\n  todo   String\n  userId String\n  Dates  DateTime\n  user   user     @relation(fields: [userId], references: [id])\n}\n',
-      "inlineSchemaHash": "ab152b6a0e92643a653a3540062a44c9747bf972dfd3bdc774cfb0b31b62c0e4",
+      "inlineSchema": `generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// userId you're providing doesn't have a corresponding entry in your users table.
+
+model user {
+  id       String  @id @default(uuid())
+  username String  @unique
+  todos    todos[]
+}
+
+model todos {
+  id     String   @id @default(uuid())
+  todo   String
+  userId String
+  Dates  DateTime
+  user   user     @relation(fields: [userId], references: [id])
+}
+`,
+      "inlineSchemaHash": "893e2f6e5ff1d85aa2d352e0be03592d1d35bf1936d0e0b79d8be8a2a21e9bd7",
       "copyEngine": true
     };
     var fs2 = require("fs");
@@ -28724,16 +28747,9 @@ var client = new import_client.PrismaClient();
 var import_cookie_parser = __toESM(require_cookie_parser());
 var app = (0, import_express.default)();
 var PORT = 3e3;
-var allowedOrigins = ["https://daily-matrix.vercel.app"];
 app.use(
   (0, import_cors.default)({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: ["https://daily-matrix.vercel.app", "https://matrix-71yc7mlqi-dishas-projects-ab780da9.vercel.app", "https://matrix-dishas-projects-ab780da9.vercel.app"],
     credentials: true
   })
 );

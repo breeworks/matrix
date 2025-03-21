@@ -8,7 +8,7 @@ const PORT = 3000;
 
 app.use(
   cors({
-    origin: ["https://daily-matrix.vercel.app"], 
+    origin: ["https://daily-matrix.vercel.app","https://matrix-71yc7mlqi-dishas-projects-ab780da9.vercel.app","https://matrix-dishas-projects-ab780da9.vercel.app"], 
     credentials: true, 
   })
 );
