@@ -88,8 +88,9 @@ app.post("/AddUser", async (req, res) => {
       res.cookie("UserId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "none",
+        path: '/', 
       });
       res.status(200).json({ message: "User found!", UserId: existingUser.id });
       return;
@@ -101,8 +102,9 @@ app.post("/AddUser", async (req, res) => {
     res.cookie("UserId", newUser.id, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
+      path: '/', 
   });
 
     res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
