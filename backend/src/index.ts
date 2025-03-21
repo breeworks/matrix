@@ -6,16 +6,29 @@ import cookieParser from "cookie-parser";
 const app = express();
 const PORT = 3000;
 
-const allowedOrigins = ["https://daily-matrix.vercel.app","https://matrix-71yc7mlqi-dishas-projects-ab780da9.vercel.app","https://matrix-dishas-projects-ab780da9.vercel.app","https://matrix-ecru.vercel.app"];
+const allowedOrigins = [
+  "https://daily-matrix.vercel.app",
+  "https://matrix-71yc7mlqi-dishas-projects-ab780da9.vercel.app",
+  "https://matrix-dishas-projects-ab780da9.vercel.app",
+  "https://matrix-ecru.vercel.app",
+];
 
 app.use(
   cors({
-    origin: allowedOrigins, 
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.options("*", cors());
 
 app.use(express.json());
 app.use(cookieParser());
