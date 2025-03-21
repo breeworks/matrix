@@ -28747,10 +28747,27 @@ var client = new import_client.PrismaClient();
 var import_cookie_parser = __toESM(require_cookie_parser());
 var app = (0, import_express.default)();
 var PORT = 3e3;
+var allowedOrigins = [
+  "https://daily-matrix.vercel.app",
+  "https://matrix-71yc7mlqi-dishas-projects-ab780da9.vercel.app",
+  "https://matrix-dishas-projects-ab780da9.vercel.app",
+  "https://matrix-ecru.vercel.app"
+];
 app.use(
   (0, import_cors.default)({
-    origin: ["https://daily-matrix.vercel.app", "https://matrix-71yc7mlqi-dishas-projects-ab780da9.vercel.app", "https://matrix-dishas-projects-ab780da9.vercel.app"],
-    credentials: true
+    origin: function(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
 app.use(import_express.default.json());
@@ -28794,8 +28811,9 @@ app.post("/AddUser", async (req, res) => {
       res.cookie("UserId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1e3,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none"
+        secure: true,
+        sameSite: "none",
+        path: "/"
       });
       res.status(200).json({ message: "User found!", UserId: existingUser.id });
       return;
@@ -28805,8 +28823,9 @@ app.post("/AddUser", async (req, res) => {
     res.cookie("UserId", newUser.id, {
       maxAge: 7 * 24 * 60 * 60 * 1e3,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none"
+      secure: true,
+      sameSite: "none",
+      path: "/"
     });
     res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
     return;
