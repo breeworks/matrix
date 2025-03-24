@@ -2,10 +2,12 @@ import express from "express";
 import cors from "cors";
 import { client } from "./prisma";
 import cookieParser from "cookie-parser";
-import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const app = express();
 const PORT = 3000;
+const SECRET_KEY = `${process.env.SECRET_KEY}`; 
+
 
 const allowedOrigins = [
   "https://daily-matrix.vercel.app",
@@ -73,6 +75,8 @@ app.get("/getMatrix", async (req, res) => {
   }
 });
 
+
+
 app.post("/AddUser", async (req, res) => {
   const { username, password } = req.body;
 
@@ -82,51 +86,53 @@ app.post("/AddUser", async (req, res) => {
   }
 
   try {
-    let existingUser = await client.user.findFirst({ where: {username: username} });
-
-    if(!existingUser){
-      res.status(401).json({ message: "User not found!" });
-      return;
-    }
+    let existingUser = await client.user.findUnique({ where: { username: username, password: password } });
 
     if (existingUser) {
-      const passwordMatch = await bcrypt.compare(password, existingUser.password);
-      if (!passwordMatch) {
+      if (existingUser.password !== password) {
         res.status(401).json({ message: "Incorrect password!" });
         return;
       }
-      console.log("Existing User Found:", existingUser.id);
-      res.cookie("UserId", existingUser.id, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+
+      const token = jwt.sign({ userId: existingUser.id }, SECRET_KEY, {
+        expiresIn: "7d", 
+      });
+
+      res.cookie("token", token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000, 
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        path: '/', 
+        path: "/",
       });
-      res.status(200).json({ message: "Login successful!", UserId: existingUser.id });
+
+      res.status(200).json({ message: "Login successful!", token });
       return;
     }
+    const newUser = await client.user.create({
+      data: {
+        username,
+        password, 
+      },
+    });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    const newUser = await client.user.create({ data: { 
-      username: username,
-      password: hashedPassword
-     } });
+    const token = jwt.sign({ userId: newUser.id }, SECRET_KEY, {
+      expiresIn: "7d",
+    });
 
-    console.log("New User Created:", newUser.id);
-    res.cookie("UserId", newUser.id, {
+    res.cookie("token", token, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      path: '/', 
-  });
+      path: "/",
+    });
 
-    res.status(201).json({ message: "User created successfully!", UserId: newUser.id });
+    res.status(201).json({ message: "User created successfully!", token });
     return;
+
   } catch (error) {
-    console.error(error);
+    console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });
     return;
   }
