@@ -73,15 +73,19 @@ app.get("/getMatrix", async (req, res) => {
 });
 
 app.post("/AddUser", async (req, res) => {
-  const { username } = req.body;
+  const { username, password } = req.body;
 
   if (!username) {
     res.status(400).json({ message: "Username is required" });
     return;
   }
+  if (!password) {
+    res.status(400).json({ message: "Password is required" });
+    return;
+  }
 
   try {
-    let existingUser = await client.user.findFirst({ where: { username } });
+    let existingUser = await client.user.findFirst({ where: {username: username, password: password} });
 
     if (existingUser) {
       console.log("Existing User Found:", existingUser.id);
@@ -96,7 +100,10 @@ app.post("/AddUser", async (req, res) => {
       return;
     }
 
-    const newUser = await client.user.create({ data: { username } });
+    const newUser = await client.user.create({ data: { 
+      username: username,
+      password: password
+     } });
 
     console.log("New User Created:", newUser.id);
     res.cookie("UserId", newUser.id, {

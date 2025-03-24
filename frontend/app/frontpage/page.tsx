@@ -10,12 +10,14 @@ const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function FrontPage() {
   const [username, setUsername] = useState<string>("");
+  const [password, setpassword] = useState<string>("");
+
   const router = useRouter()
 
   async function handleName(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
     try {
-      const response = await axios.post(`${NEXT_PUBLIC_API_URL}/AddUser`, {username} , {withCredentials: true});
+      const response = await axios.post(`${NEXT_PUBLIC_API_URL}/AddUser`, {username,password} , {withCredentials: true});
       toast.success(`${username} welcome to matrix`, { position: "top-center", autoClose: 3000, transition: Bounce });
       const data = response.data;
       console.log(data);
@@ -29,16 +31,25 @@ export default function FrontPage() {
 
   return (
     <div>
-      <span className = " text-2xl font-bold "> Welcome to your matrix </span>
-      <form>
-        <input className="p-4 rounded-2xl ml-3.5"
+      <text className = "text-2xl font-bold"> Welcome to your matrix </text>
+      <form className="mb-4">
+        <input className="p-4 rounded-2xl ml-3.5 "
           value={username}
           placeholder="your name"
           onChange={(e) => setUsername(e.target.value)}
           type="text"
         />
       </form>
-      {username && (
+      <form className="mb-4">
+        <input className="p-4 rounded-2xl ml-3.5 mt-2"
+          value={password}
+          placeholder="your password"
+          onChange={(e) => setpassword(e.target.value)}
+          type="text"
+        />
+      </form>
+
+      {username && password && (
         <button onClick={handleName}>
           <div className="text-xl font-bold ml-5" > Calendar </div>
         </button>

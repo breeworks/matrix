@@ -10,9 +10,10 @@ datasource db {
 // userId you're providing doesn't have a corresponding entry in your users table.
 
 model user {
-  id       String  @id @default(uuid())
-  username String  @unique
-  todos    todos[]
+  id          String  @id @default(uuid())
+  username    String  
+  password    String  @unique
+  todos       todos[]
 }
 
 model todos {
