@@ -4,6 +4,7 @@ import axios from "axios";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import { FaGithub, FaXTwitter } from "react-icons/fa6";
 
 
 const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
@@ -66,7 +67,18 @@ export default function FrontPage() {
           <div className="text-xl font-bold ml-5" > Calendar </div>
         </button>
       )}
+    <footer className="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 flex gap-6">
+      <div className="container mx-auto flex justify-center items-center gap-6">
+        <a href="https://github.com/breeworks" target="_blank" rel="noopener noreferrer">
+          <FaGithub className="text-2xl transition-colors" />
+        </a>
+        <a href="https://twitter.com/dishaztwts" target="_blank" rel="noopener noreferrer">
+          <FaXTwitter className="text-2xl transition-colors" />
+        </a>
+      </div>
+    </footer>
     <ToastContainer position="top-center" autoClose={3000} transition={Bounce} />
+
     </div>
   );
 }
