@@ -39,6 +39,7 @@ export default function FrontPage() {
           onChange={(e) => setUsername(e.target.value)}
           type="text"
         />
+      {toast.info(`${username} is required to login!`, { position: "top-center", autoClose: 3000, transition: Bounce })}
       </form>
       <form className="mb-4">
         <input className="p-4 rounded-2xl ml-3.5 mt-2"
@@ -47,6 +48,7 @@ export default function FrontPage() {
           onChange={(e) => setpassword(e.target.value)}
           type="text"
         />
+        {toast.info(`${password} is required to login!`, { position: "top-center", autoClose: 3000, transition: Bounce })}
       </form>
 
       {username && password && (

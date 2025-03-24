@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { client } from "./prisma";
 import cookieParser from "cookie-parser";
+import bcrypt from "bcrypt";
 
 const app = express();
 const PORT = 3000;
@@ -75,19 +76,25 @@ app.get("/getMatrix", async (req, res) => {
 app.post("/AddUser", async (req, res) => {
   const { username, password } = req.body;
 
-  if (!username) {
-    res.status(400).json({ message: "Username is required" });
-    return;
-  }
-  if (!password) {
-    res.status(400).json({ message: "Password is required" });
+  if (!username || !password) {
+    res.status(400).json({ message: "Username and password are required" });
     return;
   }
 
   try {
-    let existingUser = await client.user.findFirst({ where: {username: username, password: password} });
+    let existingUser = await client.user.findFirst({ where: {username: username} });
+
+    if(!existingUser){
+      res.status(401).json({ message: "User not found!" });
+      return;
+    }
 
     if (existingUser) {
+      const passwordMatch = await bcrypt.compare(password, existingUser.password);
+      if (!passwordMatch) {
+        res.status(401).json({ message: "Incorrect password!" });
+        return;
+      }
       console.log("Existing User Found:", existingUser.id);
       res.cookie("UserId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -96,13 +103,15 @@ app.post("/AddUser", async (req, res) => {
         sameSite: "none",
         path: '/', 
       });
-      res.status(200).json({ message: "User found!", UserId: existingUser.id });
+      res.status(200).json({ message: "Login successful!", UserId: existingUser.id });
       return;
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
     const newUser = await client.user.create({ data: { 
       username: username,
-      password: password
+      password: hashedPassword
      } });
 
     console.log("New User Created:", newUser.id);
