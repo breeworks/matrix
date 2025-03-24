@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,6 +13,18 @@ export default function FrontPage() {
   const [password, setpassword] = useState<string>("");
 
   const router = useRouter()
+
+  useEffect(() => {
+    if (!username) {
+      toast.info("Username is required to login!", { position: "top-center", autoClose: 3000, transition: Bounce });
+    }
+  }, [username]);
+
+  useEffect(() => {
+    if (!password) {
+      toast.info("Password is required to login!", { position: "top-center", autoClose: 3000, transition: Bounce });
+    }
+  }, [password]);
 
   async function handleName(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
@@ -39,16 +51,14 @@ export default function FrontPage() {
           onChange={(e) => setUsername(e.target.value)}
           type="text"
         />
-      {toast.info(`${username} is required to login!`, { position: "top-center", autoClose: 3000, transition: Bounce })}
       </form>
-      <form className="mb-4">
+      <form className="mb-4"> 
         <input className="p-4 rounded-2xl ml-3.5 mt-2"
           value={password}
           placeholder="your password"
           onChange={(e) => setpassword(e.target.value)}
-          type="text"
+          type="password"
         />
-        {toast.info(`${password} is required to login!`, { position: "top-center", autoClose: 3000, transition: Bounce })}
       </form>
 
       {username && password && (
