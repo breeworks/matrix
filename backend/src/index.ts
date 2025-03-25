@@ -42,7 +42,7 @@ app.use(cookieParser());
 
 app.get("/getMatrix", async (req, res) => {
 
-  const id = req.cookies.UserId; 
+  const id = req.cookies.userId; 
   
   if (!id) {
     res.status(400).json({ message: "Missing user ID in cookies." });
