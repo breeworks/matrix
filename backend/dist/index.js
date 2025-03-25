@@ -28392,7 +28392,6 @@ var require_client = __commonJS({
         "db"
       ],
       "activeProvider": "postgresql",
-      "postinstall": false,
       "inlineDatasources": {
         "db": {
           "url": {
@@ -28401,33 +28400,8 @@ var require_client = __commonJS({
           }
         }
       },
-      "inlineSchema": `generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-// userId you're providing doesn't have a corresponding entry in your users table.
-
-model user {
-  id       String  @id @default(uuid())
-  username String
-  password String  @unique
-  todos    todos[]
-}
-
-model todos {
-  id     String   @id @default(uuid())
-  todo   String
-  userId String
-  Dates  DateTime
-  user   user     @relation(fields: [userId], references: [id])
-}
-`,
-      "inlineSchemaHash": "693ff1672ce349a2fae6d60c63c1112a5d572f5fb9c1a6790253b6ea553bf621",
+      "inlineSchema": 'generator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel user {\n  id       String  @id @default(uuid())\n  username String\n  password String  @unique\n  todos    todos[]\n}\n\nmodel todos {\n  id     String   @id @default(uuid())\n  todo   String\n  userId String\n  Dates  DateTime\n  user   user     @relation(fields: [userId], references: [id])\n}\n',
+      "inlineSchemaHash": "f5c8d2ce8223d453ea212d7eb052faeb0438d73edf77a1ecd2bb456c5ac7a34e",
       "copyEngine": true
     };
     var fs2 = require("fs");
@@ -32547,7 +32521,8 @@ var allowedOrigins = [
   "https://daily-matrix.vercel.app",
   "https://matrix-71yc7mlqi-dishas-projects-ab780da9.vercel.app",
   "https://matrix-dishas-projects-ab780da9.vercel.app",
-  "https://matrix-ecru.vercel.app"
+  "https://matrix-ecru.vercel.app",
+  "http://localhost:3002"
 ];
 app.use(
   (0, import_cors.default)({
@@ -32607,17 +32582,18 @@ app.post("/AddUser", async (req, res) => {
         res.status(401).json({ message: "Incorrect password!" });
         return;
       }
+      console.log(existingUser.id);
       const token2 = import_jsonwebtoken.default.sign({ userId: existingUser.id }, SECRET_KEY, {
         expiresIn: "7d"
       });
-      res.cookie("token", token2, {
+      res.cookie("userId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1e3,
         httpOnly: true,
-        secure: true,
-        sameSite: "none",
+        // secure: true,
+        // sameSite: "none",
         path: "/"
       });
-      res.status(200).json({ message: "Login successful!", token: token2 });
+      res.status(200).json({ message: "Login successful!" });
       return;
     }
     const newUser = await client.user.create({
@@ -32629,11 +32605,11 @@ app.post("/AddUser", async (req, res) => {
     const token = import_jsonwebtoken.default.sign({ userId: newUser.id }, SECRET_KEY, {
       expiresIn: "7d"
     });
-    res.cookie("token", token, {
+    res.cookie("userId", newUser.id, {
       maxAge: 7 * 24 * 60 * 60 * 1e3,
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      // secure: true,
+      // sameSite: "none",
       path: "/"
     });
     res.status(201).json({ message: "User created successfully!", token });
@@ -32646,7 +32622,7 @@ app.post("/AddUser", async (req, res) => {
 });
 app.post("/AddMatrix", async (req, res) => {
   const { Dates, todo } = req.body;
-  const userId = req.cookies.UserId;
+  const userId = req.cookies.userId;
   if (!userId) {
     res.status(400).json({ message: "User ID is missing. Please log in first." });
     return;
@@ -32656,7 +32632,7 @@ app.post("/AddMatrix", async (req, res) => {
     res.status(400).json({ message: "Date is required in ISO format!" });
     return;
   }
-  console.log("cookie content", req.cookies);
+  console.log("userId", req.cookies);
   const userExists = await client.user.findUnique({
     where: { id: userId }
   });

@@ -14,6 +14,7 @@ const allowedOrigins = [
   "https://matrix-71yc7mlqi-dishas-projects-ab780da9.vercel.app",
   "https://matrix-dishas-projects-ab780da9.vercel.app",
   "https://matrix-ecru.vercel.app",
+  "http://localhost:3002"
 ];
 
 app.use(
@@ -76,7 +77,6 @@ app.get("/getMatrix", async (req, res) => {
 });
 
 
-
 app.post("/AddUser", async (req, res) => {
   const { username, password } = req.body;
 
@@ -93,12 +93,14 @@ app.post("/AddUser", async (req, res) => {
         res.status(401).json({ message: "Incorrect password!" });
         return;
       }
+      console.log(existingUser.id);
+      
 
       const token = jwt.sign({ userId: existingUser.id }, SECRET_KEY, {
         expiresIn: "7d", 
       });
 
-      res.cookie("token", token, {
+      res.cookie("userId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1000, 
         httpOnly: true,
         secure: true,
@@ -106,7 +108,7 @@ app.post("/AddUser", async (req, res) => {
         path: "/",
       });
 
-      res.status(200).json({ message: "Login successful!", token });
+      res.status(200).json({ message: "Login successful!" });
       return;
     }
     const newUser = await client.user.create({
@@ -120,7 +122,7 @@ app.post("/AddUser", async (req, res) => {
       expiresIn: "7d",
     });
 
-    res.cookie("token", token, {
+    res.cookie("userId", newUser.id, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: true,
@@ -140,7 +142,7 @@ app.post("/AddUser", async (req, res) => {
 
 app.post("/AddMatrix", async (req, res) => {
     const { Dates, todo } = req.body;
-    const userId = req.cookies.UserId;
+    const userId = req.cookies.userId;
 
     if (!userId) {
       res.status(400).json({ message: "User ID is missing. Please log in first." });
@@ -153,7 +155,7 @@ app.post("/AddMatrix", async (req, res) => {
       return 
     }
 
-    console.log("cookie content",req.cookies);
+    console.log("userId",req.cookies);
 
     const userExists = await client.user.findUnique({
       where: { id: userId }
@@ -203,7 +205,7 @@ app.post("/AddMatrix", async (req, res) => {
         else{
           console.log("Creating todo with:", { Dates, newTodos, userId });
 
-          const createdTodo = await client.todos.create({data:{Dates: new Date(Dates), todo: newTodos[i],userId}});
+          const createdTodo = await client.todos.create({data:{Dates: new Date(Dates), todo: newTodos[i], userId}});
           createdEntries.push({ id: createdTodo.id, todo: createdTodo.todo });
         }
       }

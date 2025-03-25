@@ -117,10 +117,10 @@ export default function Calendar() {
     const count = entry?.content.length || 0;
 
     if (count === 0) return "";
-    if (count < 9) return "bg-gradient-to-r from-blue-200 via-blue-200 to-blue-300";
-    if (count < 12) return "bg-gradient-to-r from-blue-300 via-blue-400 to-blue-600";
-    if (count < 15) return "bg-gradient-to-r from-blue-400 via-blue-600 to-blue-800";
-    return "bg-gradient-to-r from-blue-200 via-blue-300 to-blue-400";
+    if (count < 9) return "bg-gradient-to-r from-purple-200 via-purple-200 to-purple-300";
+    if (count < 12) return "bg-gradient-to-r from-purple-300 via-purple-400 to-purple-600";
+    if (count < 15) return "bg-gradient-to-r from-purple-400 via-purple-600 to-purple-800";
+    return "bg-gradient-to-r from-purple-200 via-purple-300 to-purple-400";
   }
 
   async function handleSubmit() {

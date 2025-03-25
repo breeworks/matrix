@@ -31,11 +31,15 @@ export default function FrontPage() {
     e.preventDefault()
     try {
       const response = await axios.post(`${NEXT_PUBLIC_API_URL}/AddUser`, {username,password} , {withCredentials: true});
-      toast.success(`${username} welcome to matrix`, { position: "top-center", autoClose: 3000, transition: Bounce });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const data = response.data;
-      // console.log(data);
-      setTimeout(() => router.push("/Daily"), 1000);
+      if(response){
+        toast.success(`${username} welcome to matrix`, { position: "top-center", autoClose: 3000, transition: Bounce });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const data = response.data;
+        // console.log(data);
+        setTimeout(() => router.push("/Daily"), 1000);  
+      } else{
+        toast.error(`check password again`, { position: "top-center", autoClose: 3000, transition: Bounce });
+      }
 
     } catch (error) {
       console.log(error);
