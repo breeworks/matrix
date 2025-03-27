@@ -32544,7 +32544,7 @@ app.use(
 app.use(import_express.default.json());
 app.use((0, import_cookie_parser.default)());
 app.get("/getMatrix", async (req, res) => {
-  const id2 = req.cookies.UserId;
+  const id2 = req.cookies.userId;
   if (!id2) {
     res.status(400).json({ message: "Missing user ID in cookies." });
     return;
@@ -32589,8 +32589,8 @@ app.post("/AddUser", async (req, res) => {
       res.cookie("userId", existingUser.id, {
         maxAge: 7 * 24 * 60 * 60 * 1e3,
         httpOnly: true,
-        // secure: true,
-        // sameSite: "none",
+        secure: true,
+        sameSite: "none",
         path: "/"
       });
       res.status(200).json({ message: "Login successful!" });
@@ -32608,8 +32608,8 @@ app.post("/AddUser", async (req, res) => {
     res.cookie("userId", newUser.id, {
       maxAge: 7 * 24 * 60 * 60 * 1e3,
       httpOnly: true,
-      // secure: true,
-      // sameSite: "none",
+      secure: true,
+      sameSite: "none",
       path: "/"
     });
     res.status(201).json({ message: "User created successfully!", token });
@@ -32632,7 +32632,7 @@ app.post("/AddMatrix", async (req, res) => {
     res.status(400).json({ message: "Date is required in ISO format!" });
     return;
   }
-  console.log("userId", req.cookies);
+  console.log("userId", req.cookies.userId);
   const userExists = await client.user.findUnique({
     where: { id: userId }
   });

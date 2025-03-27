@@ -155,7 +155,7 @@ app.post("/AddMatrix", async (req, res) => {
       return 
     }
 
-    console.log("userId",req.cookies);
+    console.log("userId",req.cookies.userId);
 
     const userExists = await client.user.findUnique({
       where: { id: userId }
